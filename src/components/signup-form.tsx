@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { signUp } from "@/lib/auth-client";
+import Link from "next/link";
 
 type SignUpValues = {
   email: string;
@@ -41,10 +44,12 @@ const signupSchema = z
   });
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -54,13 +59,24 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       confirmPassword: "",
     },
   });
-
-  const onSubmit = (data: SignUpValues) => {
+  const onSubmit = async (data: SignUpValues) => {
     if (data.password.trim() !== data.confirmPassword.trim()) {
       toast.error("Invalid confirm password");
       return;
     }
-    toast.success("Account created successfully");
+
+    const res = await signUp.email({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    });
+
+    if (res.error) {
+      toast.error(res.error.message || "Something went wrong");
+    } else {
+      // router.push("/dashboard");
+      toast.error("Account successfully created");
+    }
   };
 
   return (
@@ -140,12 +156,15 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
             <FieldGroup>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button disabled={isSubmitting} type="submit">
+                  Create Account
+                </Button>
                 <Button variant="outline" type="button">
                   Sign up with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="#">Sign in</a>
+                  Already have an account? {""}
+                  <Link href={"/sign-in"}>Sign in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
