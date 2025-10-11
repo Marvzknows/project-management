@@ -18,7 +18,6 @@ import { FolderKanban, Home, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -52,7 +51,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <VersionSwitcher />
       </SidebarHeader>
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
         {data.navMain.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
