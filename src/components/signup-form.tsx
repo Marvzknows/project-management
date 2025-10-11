@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import { signUp } from "@/lib/auth-client";
 import Link from "next/link";
 
@@ -44,12 +43,11 @@ const signupSchema = z
   });
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -74,8 +72,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     if (res.error) {
       toast.error(res.error.message || "Something went wrong");
     } else {
-      // router.push("/dashboard");
-      toast.error("Account successfully created");
+      toast.success("Account successfully created");
+      reset();
     }
   };
 
