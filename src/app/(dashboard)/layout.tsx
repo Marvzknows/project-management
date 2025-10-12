@@ -16,10 +16,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { signOut } from "@/lib/auth-client";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Toaster } from "sonner";
+import { usePathname, useRouter } from "next/navigation";
+import { toast, Toaster } from "sonner";
 
 export default function DashboardLayout({
   children,
@@ -27,6 +28,22 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  // Call the Me API here
+  // Store in the Context API the Me API user's important data
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+
+    if (error) {
+      toast.error(error.message || "Something went wrong");
+    } else {
+      toast.success("Signed out successfully");
+      setTimeout(() => {
+        router.push("/sign-in");
+      }, 1000);
+    }
+  };
 
   // split pathname: "/projects" -> ["projects"]
   const segments = pathname.split("/").filter(Boolean);
@@ -77,7 +94,7 @@ export default function DashboardLayout({
 
           <div className="ml-auto space-x-1">
             <ThemeToggle />
-            <Button className="ml-auto" variant="ghost">
+            <Button onClick={handleSignOut} className="ml-auto" variant="ghost">
               <LogOut />
               Logout
             </Button>
