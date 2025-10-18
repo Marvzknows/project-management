@@ -41,7 +41,7 @@ const LoginForm = () => {
     if (error) {
       toast.error(error.message || "Something went wrong");
     } else {
-      toast.error("Signed in successfully!");
+      toast.success("Signed in successfully!");
       router.push("/dashboard");
     }
   };

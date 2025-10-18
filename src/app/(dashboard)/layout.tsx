@@ -40,7 +40,7 @@ export default function DashboardLayout({
     } else {
       toast.success("Signed out successfully");
       setTimeout(() => {
-        router.push("/sign-in");
+        router.replace("/sign-in");
       }, 1000);
     }
   };
