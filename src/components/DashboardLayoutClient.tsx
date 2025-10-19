@@ -23,17 +23,27 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 import FullPageLoader from "./FullPageLoader";
 import FullPageError from "./FullPageError";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "@/context/auth/AuthContext";
 
 export default function DashboardLayoutClient({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { setUserAuth, setSessionAuth } = useContext(AuthContext);
   const pathname = usePathname();
   const router = useRouter();
-  // Call the Me API here
-  const { isPending, error, refetch } = useSession();
-  // Store in the Context API the Me API user's important data
+
+  const { data, isPending, error, refetch } = useSession();
+
+  // Store session and user data in context when available
+  useEffect(() => {
+    if (data) {
+      setUserAuth(data.user || null);
+      setSessionAuth(data.session || null);
+    }
+  }, [data, setUserAuth, setSessionAuth]);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
