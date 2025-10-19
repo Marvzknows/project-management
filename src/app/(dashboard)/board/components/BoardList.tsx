@@ -37,7 +37,11 @@ const BoardList = () => {
       </div>
 
       {/* Task Cards */}
-      <TaskCard />
+      <TaskCard priority={"NONE"} />
+      <TaskCard priority={"LOW"} />
+      <TaskCard priority={"HIGH"} />
+      <TaskCard priority={"URGENT"} />
+      <TaskCard priority={"VERY HIGH"} />
     </div>
   );
 };

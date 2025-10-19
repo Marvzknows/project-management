@@ -9,7 +9,7 @@ import BoardList from "./components/BoardList";
 const BoardPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="p-4 h-full flex flex-col border border-red-500">
+    <div className="p-4 h-full flex flex-col">
       {/* Board name & board list */}
       <div className="flex items-center justify-between border-b pb-2">
         <BoardListComboBox />
