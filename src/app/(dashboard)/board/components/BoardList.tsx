@@ -10,7 +10,7 @@ import TaskCard from "./TaskCard";
 
 const BoardList = () => {
   return (
-    <div className="min-w-[280px] max-w-[280px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
+    <div className="min-w-[380px] max-w-[380px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
       <div className="flex items-center justify-between sticky top-0 bg-secondary z-10 pb-2">
         <h2 className="text-lg">List Name</h2>
         <DropdownMenu>
