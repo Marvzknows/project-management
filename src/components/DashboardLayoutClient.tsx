@@ -16,11 +16,13 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { signOut } from "@/lib/auth-client";
+import { signOut, useSession } from "@/lib/auth-client";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
+import FullPageLoader from "./FullPageLoader";
+import FullPageError from "./FullPageError";
 
 export default function DashboardLayoutClient({
   children,
@@ -30,6 +32,7 @@ export default function DashboardLayoutClient({
   const pathname = usePathname();
   const router = useRouter();
   // Call the Me API here
+  const { isPending, error, refetch } = useSession();
   // Store in the Context API the Me API user's important data
 
   const handleSignOut = async () => {
@@ -45,8 +48,17 @@ export default function DashboardLayoutClient({
     }
   };
 
+  if (isPending) {
+    return <FullPageLoader />;
+  }
+
+  if (error) {
+    return <FullPageError onRetry={refetch} />;
+  }
+
   // split pathname: "/projects" -> ["projects"]
   const segments = pathname.split("/").filter(Boolean);
+
   return (
     <SidebarProvider>
       <AppSidebar />
