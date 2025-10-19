@@ -1,4 +1,4 @@
-import { CirclePlus, MoreHorizontalIcon, Trash } from "lucide-react";
+import { CirclePlus, MoreHorizontalIcon, Pencil, Trash } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,11 +26,15 @@ const BoardList = () => {
           <DropdownMenuContent className="w-56" align="start">
             <DropdownMenuItem className="text-green-500 hover:text-white">
               <CirclePlus className="text-green-500 hover:text-white" />
-              Add Card
+              Add list
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-blue-500 hover:text-white">
+              <Pencil className="text-blue-500 hover:text-white" />
+              Edit list
             </DropdownMenuItem>
             <DropdownMenuItem className="text-red-500 hover:text-white">
               <Trash className="text-red-500 hover:text-white" />
-              Delete Card
+              Delete list
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

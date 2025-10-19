@@ -5,6 +5,7 @@ import BoardListComboBox from "./components/BoardListComboBox";
 import AddMemberDialog from "./components/AddMemberDialog";
 import AvatarStacked from "./components/AvatarStacked";
 import BoardList from "./components/BoardList";
+import AddBoardListDialog from "./components/AddBoardListDialog";
 
 const BoardPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,9 +22,11 @@ const BoardPage = () => {
 
       {/* Board */}
       <div className="flex-1 min-h-0">
-        <div className="flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
+        <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
           {/* List */}
           <BoardList />
+          <BoardList />
+          <AddBoardListDialog />
         </div>
       </div>
     </div>
