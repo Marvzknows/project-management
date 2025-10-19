@@ -50,7 +50,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator
@@ -102,7 +102,9 @@ export default function DashboardLayout({
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 flex flex-col mx-auto w-full">{children}</div>
+        <div className="flex-1 flex flex-col mx-auto w-full min-h-0 overflow-hidden">
+          {children}
+        </div>
       </SidebarInset>
       <Toaster richColors position="top-right" />
     </SidebarProvider>
