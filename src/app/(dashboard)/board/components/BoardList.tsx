@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import TaskCard from "./TaskCard";
 
 const BoardList = () => {
   return (
@@ -15,8 +15,12 @@ const BoardList = () => {
         <h2 className="text-lg">List Name</h2>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" aria-label="Open menu" size="icon-sm">
-              <MoreHorizontalIcon />
+            <Button
+              className="bg-transparent text-white hover:bg-transparent"
+              aria-label="Open menu"
+              size="icon-sm"
+            >
+              <MoreHorizontalIcon className="cursor-pointer" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="start">
@@ -33,14 +37,7 @@ const BoardList = () => {
       </div>
 
       {/* Task Cards */}
-      <Card className="shadow-none rounded">
-        <CardHeader>
-          <CardTitle className="text-base">Task title</CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs text-muted-foreground">
-          Created: June 28 2001
-        </CardContent>
-      </Card>
+      <TaskCard />
     </div>
   );
 };
