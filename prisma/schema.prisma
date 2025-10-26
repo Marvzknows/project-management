@@ -25,6 +25,10 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  // # Boards this user owns
+  ownedBoards   Board[]   @relation("BoardOwner")
+  // # Boards this user is a member of
+  memberBoards  Board[]   @relation("BoardMembers")
 
   @@unique([email])
   @@map("user")
@@ -73,4 +77,33 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+// Board
+
+model Board {
+  id        String   @id @default(cuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+
+  // # The user who owns the board
+  owner   User   @relation("BoardOwner", fields: [userId], references: [id])
+  // # The members of the board
+  members User[] @relation("BoardMembers")
+}
+
+// List
+
+// Card
+
+// Comment
+
+// Prioritization
+enum PriorityList {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }
