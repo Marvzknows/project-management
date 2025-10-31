@@ -25,6 +25,15 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  // # Boards this user owns
+  ownedBoards   Board[]   @relation("BoardOwner")
+  // # Boards this user is a member of
+  memberBoards  Board[]   @relation("BoardMembers")
+
+  createdCards  Card[]    @relation("UserCreatedCards")
+  assignedCards Card[]    @relation("CardAssignees")
+  Comment       Comment[]
+  List          List[]
 
   @@unique([email])
   @@map("user")
@@ -73,4 +82,71 @@ model Verification {
   updatedAt  DateTime @default(now()) @updatedAt
 
   @@map("verification")
+}
+
+// Board
+
+model Board {
+  id        String   @id @default(cuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ownerId   String
+
+  // # The user who owns the board
+  owner   User   @relation("BoardOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  // # The members of the board
+  members User[] @relation("BoardMembers")
+  List    List[]
+}
+
+// List
+model List {
+  id          String   @id @default(cuid())
+  title       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  position    Int
+  boardId     String
+  board       Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards       Card[]
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  // add created by
+}
+
+// Card
+model Card {
+  id          String       @id @default(cuid())
+  title       String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  List        List         @relation(fields: [listId], references: [id])
+  listId      String
+  position    Int
+  createdById String
+  createdBy   User         @relation("UserCreatedCards", fields: [createdById], references: [id], onDelete: Cascade)
+  assignees   User[]       @relation("CardAssignees")
+  priority    PriorityList
+  comments    Comment[]
+}
+
+// Comment
+model Comment {
+  id          String   @id @default(cuid())
+  description String
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardId      String
+}
+
+// Prioritization
+enum PriorityList {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
 }

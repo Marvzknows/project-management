@@ -26,7 +26,7 @@ const BoardList = () => {
           <DropdownMenuContent className="w-56" align="start">
             <DropdownMenuItem className="text-green-500 hover:text-white">
               <CirclePlus className="text-green-500 hover:text-white" />
-              Add list
+              Add card
             </DropdownMenuItem>
             <DropdownMenuItem className="text-blue-500 hover:text-white">
               <Pencil className="text-blue-500 hover:text-white" />
