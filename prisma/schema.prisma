@@ -30,8 +30,10 @@ model User {
   // # Boards this user is a member of
   memberBoards  Board[]   @relation("BoardMembers")
 
-  createdCards  Card[] @relation("UserCreatedCards")
-  assignedCards Card[] @relation("CardAssignees")
+  createdCards  Card[]    @relation("UserCreatedCards")
+  assignedCards Card[]    @relation("CardAssignees")
+  Comment       Comment[]
+  List          List[]
 
   @@unique([email])
   @@map("user")
@@ -100,14 +102,16 @@ model Board {
 
 // List
 model List {
-  id        String   @id @default(cuid())
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  position  Int
-  boardId   String
-  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  cards     Card[]
+  id          String   @id @default(cuid())
+  title       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  position    Int
+  boardId     String
+  board       Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  cards       Card[]
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
   // add created by
 }
 
@@ -129,11 +133,14 @@ model Card {
 
 // Comment
 model Comment {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  cardId    String
+  id          String   @id @default(cuid())
+  description String
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardId      String
 }
 
 // Prioritization
