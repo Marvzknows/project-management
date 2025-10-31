@@ -104,10 +104,17 @@ model List {
   position  Int
   boardId   String
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  // Card relationship WIP
+  cards     Card[]
 }
 
 // Card
+model Card {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  List      List     @relation(fields: [listId], references: [id])
+  listId    String
+}
 
 // Comment
 
