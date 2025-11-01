@@ -9,7 +9,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -17,7 +16,6 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { signOut, useSession } from "@/lib/auth-client";
-import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
@@ -25,6 +23,7 @@ import FullPageLoader from "./FullPageLoader";
 import FullPageError from "./FullPageError";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "@/context/auth/AuthContext";
+import ProfileDropdowMenu from "./ProfileDropdownMenu";
 
 export default function DashboardLayoutClient({
   children,
@@ -114,12 +113,9 @@ export default function DashboardLayoutClient({
             </BreadcrumbList>
           </Breadcrumb>
 
-          <div className="ml-auto space-x-1">
+          <div className="ml-auto flex items-center gap-1">
             <ThemeToggle />
-            <Button onClick={handleSignOut} className="ml-auto" variant="ghost">
-              <LogOut />
-              Logout
-            </Button>
+            <ProfileDropdowMenu handleSignOut={handleSignOut} />
           </div>
         </header>
 
