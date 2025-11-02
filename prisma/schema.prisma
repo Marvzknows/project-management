@@ -25,10 +25,13 @@ model User {
   updatedAt     DateTime  @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  activeBoardId String?
+  activeBoard   Board?    @relation("UserActiveBoard", fields: [activeBoardId], references: [id])
+
   // # Boards this user owns
-  ownedBoards   Board[]   @relation("BoardOwner")
+  ownedBoards  Board[] @relation("BoardOwner")
   // # Boards this user is a member of
-  memberBoards  Board[]   @relation("BoardMembers")
+  memberBoards Board[] @relation("BoardMembers")
 
   createdCards  Card[]    @relation("UserCreatedCards")
   assignedCards Card[]    @relation("CardAssignees")
@@ -94,10 +97,11 @@ model Board {
   ownerId   String
 
   // # The user who owns the board
-  owner   User   @relation("BoardOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  owner       User   @relation("BoardOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   // # The members of the board
-  members User[] @relation("BoardMembers")
-  List    List[]
+  members     User[] @relation("BoardMembers")
+  List        List[]
+  activeUsers User[] @relation("UserActiveBoard")
 }
 
 // List
