@@ -6,8 +6,9 @@ import prisma from "@/lib/prisma";
 // Get Board by ID
 export const GET = async (
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
+  const { id } = await params;
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -18,7 +19,7 @@ export const GET = async (
     }
 
     const board = await prisma.board.findUnique({
-      where: { id: params.id },
+      where: { id: id },
       select: {
         title: true,
         owner: true,
@@ -64,8 +65,9 @@ export const GET = async (
 // Delete Board by ID
 export const DELETE = async (
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
+  const { id } = await params;
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -77,7 +79,7 @@ export const DELETE = async (
 
     const board = await prisma.board.findUnique({
       where: {
-        id: params.id,
+        id: id,
       },
       select: {
         id: true,
@@ -96,7 +98,7 @@ export const DELETE = async (
     // Delete the board
     await prisma.board.delete({
       where: {
-        id: params.id,
+        id: id,
       },
     });
 
