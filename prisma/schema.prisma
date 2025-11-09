@@ -116,7 +116,6 @@ model List {
   cards       Card[]
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
-  // add created by
 }
 
 // Card
