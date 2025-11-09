@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +22,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -41,8 +42,24 @@ const LoginForm = () => {
     if (error) {
       toast.error(error.message || "Something went wrong");
     } else {
-      toast.error("Signed in successfully!");
+      toast.success("Signed in successfully!");
       router.push("/dashboard");
+    }
+  };
+
+  const handleSocialSignIn = async (socialProvider: "google" | "github") => {
+    setLoading(true);
+    const { error } = await signIn.social({
+      provider: socialProvider,
+      callbackURL: "/dashboard",
+    });
+
+    setLoading(false);
+
+    if (error) {
+      toast.error(error.message || "Something wen wrong", {
+        description: "Unable to sign-in, please try again",
+      });
     }
   };
 
@@ -96,7 +113,11 @@ const LoginForm = () => {
                 )}
               </div>
 
-              <Button disabled={isSubmitting} type="submit" className="w-full">
+              <Button
+                disabled={isSubmitting || loading}
+                type="submit"
+                className="w-full"
+              >
                 {isSubmitting ? "Logging in.." : "Login"}
               </Button>
             </div>
@@ -109,27 +130,64 @@ const LoginForm = () => {
             </div>
 
             {/* OAuth buttons */}
+            {/* OAuth buttons */}
             <div className="grid gap-4 sm:grid-cols-2">
-              <Button variant="outline" type="button" className="w-full">
-                {/* Apple icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              {/* Google Button */}
+              <Button
+                disabled={loading}
+                variant="outline"
+                type="button"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => handleSocialSignIn("google")}
+              >
+                {/* Google icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5"
+                >
                   <path
-                    d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-                    fill="currentColor"
+                    fill="#EA4335"
+                    d="M12 10.2v3.9h5.46c-.22 1.4-.9 2.6-1.93 3.4l3.12 2.4c1.83-1.7 2.89-4.2 2.89-7.2 0-.7-.07-1.37-.19-2H12z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M5.33 14.48a5.88 5.88 0 0 1 0-4.96L2.05 7.1a9.94 9.94 0 0 0 0 9.8l3.28-2.42z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M12 4.75c1.04 0 1.97.36 2.71 1.07l2.02-2.02A9.55 9.55 0 0 0 12 2a9.94 9.94 0 0 0-9.95 9.1l3.28 2.42A5.9 5.9 0 0 1 12 4.75z"
+                  />
+                  <path
+                    fill="#4285F4"
+                    d="M12 22c2.6 0 4.78-.85 6.38-2.3l-3.12-2.4a5.9 5.9 0 0 1-9.1-3.1L2.05 16.9A9.94 9.94 0 0 0 12 22z"
                   />
                 </svg>
-                Continue with Apple
+                <span>Continue with Google</span>
               </Button>
 
-              <Button variant="outline" type="button" className="w-full">
-                {/* Google icon */}
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              {/* GitHub Button */}
+              <Button
+                disabled={loading}
+                variant="outline"
+                type="button"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => handleSocialSignIn("github")}
+              >
+                {/* GitHub icon */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-5 h-5"
+                >
                   <path
-                    d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M12 .5C5.65.5.5 5.65.5 12c0 5.1 3.29 9.43 7.86 10.96.57.1.78-.25.78-.56v-2.18c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.26-1.67-1.26-1.67-1.03-.7.08-.68.08-.68 1.14.08 1.74 1.18 1.74 1.18 1.01 1.74 2.65 1.24 3.3.95.1-.74.4-1.25.72-1.54-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a10.84 10.84 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.7 5.4-5.28 5.68.41.36.78 1.07.78 2.16v3.19c0 .31.21.66.79.55A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"
+                    clipRule="evenodd"
                   />
                 </svg>
-                Continue with Google
+                <span>Continue with GitHub</span>
               </Button>
             </div>
           </div>

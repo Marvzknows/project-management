@@ -26,13 +26,15 @@ type SignUpValues = {
   email: string;
   password: string;
   confirmPassword: string;
-  name: string;
+  firstName: string;
+  lastName: string;
 };
 
 // Zod validation schema
 const signupSchema = z
   .object({
-    name: z.string().min(1, "Full name is required"),
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
@@ -51,7 +53,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   } = useForm({
     resolver: zodResolver(signupSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -63,8 +66,10 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       return;
     }
 
+    const fullName = `${data.firstName.trim()} ${data.lastName.trim()}`;
+
     const res = await signUp.email({
-      name: data.name,
+      name: fullName,
       email: data.email,
       password: data.password,
     });
@@ -89,16 +94,31 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
+              <FieldLabel htmlFor="firstName">First Name</FieldLabel>
               <Input
-                id="name"
+                id="firstName"
                 type="text"
-                placeholder="John Doe"
-                {...register("name")}
+                placeholder="John"
+                {...register("firstName")}
               />
-              {errors.name && (
+              {errors.firstName && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.name.message}
+                  {errors.firstName.message}
+                </p>
+              )}
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
+              <Input
+                id="lastName"
+                type="text"
+                placeholder="Doe"
+                {...register("lastName")}
+              />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.lastName.message}
                 </p>
               )}
             </Field>

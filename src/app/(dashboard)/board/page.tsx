@@ -1,7 +1,14 @@
-import React from "react";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import BoardPage from "./BoardPage";
 
-const Board = () => {
-  return <div>Board</div>;
-};
+export default async function Board() {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-export default Board;
+  if (!session) {
+    redirect("/sign-in");
+  }
+
+  return <BoardPage />;
+}
