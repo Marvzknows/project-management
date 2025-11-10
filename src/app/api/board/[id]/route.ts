@@ -116,3 +116,57 @@ export const DELETE = async (
     );
   }
 };
+
+// Update user active board
+export const PUT = async (
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    // check if user is member of the board
+    const board = await prisma.board.findUnique({
+      where: { id: id },
+      select: { id: true, members: { select: { id: true } } },
+    });
+
+    if (!board) {
+      return NextResponse.json({ error: "Board not found" }, { status: 404 });
+    }
+
+    const isMember = board.members.some((m) => m.id === session.user.id);
+
+    if (!isMember) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // update user "activeBoardId"
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: {
+        activeBoardId: board.id,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        message: "Set active board successfully",
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+};
