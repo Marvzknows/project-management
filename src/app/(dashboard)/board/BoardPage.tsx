@@ -1,33 +1,63 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import BoardListComboBox from "./components/BoardListComboBox";
 import AddMemberDialog from "./components/AddMemberDialog";
 import AvatarStacked from "./components/AvatarStacked";
 import BoardList from "./components/BoardList";
 import AddBoardListDialog from "./components/AddBoardListDialog";
 import CreateBoardDialog from "./components/CreateBoardDialog";
-import { getBoardApi } from "@/lib/axios/api/boardApi";
-import { useQuery } from "@tanstack/react-query";
+import { useBoard, useBoardList } from "@/hooks/boardHooks";
+import FullPageError from "@/components/FullPageError";
+import BoardPageSkeleton from "./components/BoardPageSkeleton";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const BoardPage = () => {
-  const { data, isFetching, error } = useQuery({
-    queryKey: ["boardList"],
-    queryFn: async () => {
-      return await getBoardApi();
-    },
-  });
   const [isOpen, setIsOpen] = useState(false);
-  console.log("BOARD DATA: ", data);
+  const [searchBoard, setSearchBoard] = useState("");
+  const [selectedBoard, setSelectedBoard] = useState("");
+  const debouncedSearch = useDebounce(searchBoard, 500);
 
-  if (isFetching) return <div>Loading...</div>;
-  if (error) return <div>Error aloading boards</div>;
+  // #region API
+  const {
+    data: boardListData,
+    isLoading: isLoadingBoardList,
+    isError: isErrorBoardList,
+  } = useBoardList({ isAll: true, search: debouncedSearch });
+
+  const {
+    data: _boardData,
+    isLoading: isLoadingBoardData,
+    isError: isErrorBoardData,
+  } = useBoard(selectedBoard);
+  // #endregion
+
+  const boardOptions = useMemo(() => {
+    return (
+      boardListData?.data.map((b) => ({
+        label: b.title,
+        value: b.id,
+      })) ?? []
+    );
+  }, [boardListData]);
+
+  if (isLoadingBoardData) return <BoardPageSkeleton />;
+
+  if (isErrorBoardList || isErrorBoardData) return <FullPageError />;
+
   return (
     <div className="p-4 h-full flex flex-col">
       {/* Board name & board list */}
       <div className="flex items-center justify-between border-b pb-2">
         <div className="flex items-center gap-2">
-          <BoardListComboBox />
+          <BoardListComboBox
+            options={boardOptions}
+            searchBoard={searchBoard}
+            setSearchBoard={setSearchBoard}
+            isSearching={isLoadingBoardList}
+            selectedBoard={selectedBoard}
+            setSelectedBoard={setSelectedBoard}
+          />
           <CreateBoardDialog />
         </div>
         <div className="flex items-center gap-2">

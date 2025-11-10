@@ -1,14 +1,12 @@
 "use client";
 
-import { Check, ChevronsUpDown } from "lucide-react";
-
+import { Check, ChevronsUpDown, SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
@@ -19,28 +17,30 @@ import {
 } from "@/components/ui/popover";
 import { useState } from "react";
 
-const boards = [
-  {
-    value: "1",
-    label: "Board One",
-  },
-  {
-    value: "2",
-    label: "Board Two",
-  },
-  {
-    value: "3",
-    label: "Board Three",
-  },
-  {
-    value: "4",
-    label: "Board Four",
-  },
-];
+export type BoardListComboBoxProps = {
+  options: {
+    label: string;
+    value: string;
+  }[];
+  searchBoard: string;
+  setSearchBoard: React.Dispatch<React.SetStateAction<string>>;
+  isSearching: boolean;
+  selectedBoard: string;
+  setSelectedBoard: React.Dispatch<React.SetStateAction<string>>;
+};
 
-const BoardListComboBox = () => {
+const BoardListComboBox = ({
+  options,
+  searchBoard,
+  setSearchBoard,
+  isSearching,
+  selectedBoard,
+  setSelectedBoard,
+}: BoardListComboBoxProps) => {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+
+  const selectedLabel =
+    options.find((b) => b.value === selectedBoard)?.label || "Select board...";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -51,37 +51,61 @@ const BoardListComboBox = () => {
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          {value
-            ? boards.find((b) => b.value === value)?.label
-            : "Select board..."}
+          {selectedLabel}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
+
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search board..." className="h-9" />
+          {/* Search Input */}
+          <div
+            data-slot="command-input-wrapper"
+            className="flex h-9 items-center gap-2 border-b px-3"
+          >
+            <SearchIcon className="size-4 shrink-0 opacity-50" />
+            <input
+              data-slot="command-input"
+              placeholder="Search board"
+              className="placeholder:text-muted-foreground flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50"
+              value={searchBoard}
+              onChange={(e) => setSearchBoard(e.target.value)}
+            />
+          </div>
+
+          {/* Board Options */}
           <CommandList>
-            <CommandEmpty>No board found.</CommandEmpty>
-            <CommandGroup>
-              {boards.map((b) => (
-                <CommandItem
-                  key={b.value}
-                  value={b.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  {b.label}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      value === b.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {isSearching ? (
+              <CommandEmpty>Searching board...</CommandEmpty>
+            ) : (
+              <>
+                <CommandEmpty>No board found.</CommandEmpty>
+                <CommandGroup>
+                  {options.map((b) => (
+                    <CommandItem
+                      key={b.value}
+                      value={b.value}
+                      onSelect={(currentValue) => {
+                        setSelectedBoard(
+                          currentValue === selectedBoard ? "" : currentValue
+                        );
+                        setOpen(false);
+                      }}
+                    >
+                      {b.label}
+                      <Check
+                        className={cn(
+                          "ml-auto transition-opacity",
+                          selectedBoard === b.value
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>
