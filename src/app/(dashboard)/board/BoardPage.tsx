@@ -7,9 +7,21 @@ import AvatarStacked from "./components/AvatarStacked";
 import BoardList from "./components/BoardList";
 import AddBoardListDialog from "./components/AddBoardListDialog";
 import CreateBoardDialog from "./components/CreateBoardDialog";
+import { getBoardApi } from "@/lib/axios/api/boardApi";
+import { useQuery } from "@tanstack/react-query";
 
 const BoardPage = () => {
+  const { data, isFetching, error } = useQuery({
+    queryKey: ["boardList"],
+    queryFn: async () => {
+      return await getBoardApi();
+    },
+  });
   const [isOpen, setIsOpen] = useState(false);
+  console.log("BOARD DATA: ", data);
+
+  if (isFetching) return <div>Loading...</div>;
+  if (error) return <div>Error aloading boards</div>;
   return (
     <div className="p-4 h-full flex flex-col">
       {/* Board name & board list */}
