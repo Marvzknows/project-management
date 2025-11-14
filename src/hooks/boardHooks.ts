@@ -11,11 +11,12 @@ export const useBoardList = (params: UseBoardParamsT) => {
   });
 };
 
-export const useBoard = (boardId: string) => {
+export const useBoard = (boardId: string | null | undefined) => {
   return useQuery({
     queryKey: ["boardData", boardId],
     queryFn: async () => {
-      return await getBoardApi(boardId);
+      return await getBoardApi(boardId!);
     },
+    enabled: !!boardId,
   });
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import BoardListComboBox from "./components/BoardListComboBox";
 import AddMemberDialog from "./components/AddMemberDialog";
 import AvatarStacked from "./components/AvatarStacked";
@@ -11,8 +11,10 @@ import { useBoard, useBoardList } from "@/hooks/boardHooks";
 import FullPageError from "@/components/FullPageError";
 import BoardPageSkeleton from "./components/BoardPageSkeleton";
 import { useDebounce } from "@/hooks/useDebounce";
+import { AuthContext } from "@/context/auth/AuthContext";
 
 const BoardPage = () => {
+  const { user } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [searchBoard, setSearchBoard] = useState("");
   const [selectedBoard, setSelectedBoard] = useState("");
@@ -29,7 +31,7 @@ const BoardPage = () => {
     data: _boardData,
     isLoading: isLoadingBoardData,
     isError: isErrorBoardData,
-  } = useBoard(selectedBoard);
+  } = useBoard(user?.activeBoardId);
   // #endregion
 
   const boardOptions = useMemo(() => {
@@ -67,14 +69,18 @@ const BoardPage = () => {
       </div>
 
       {/* Board */}
-      <div className="flex-1 min-h-0">
-        <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
-          {/* List */}
-          <BoardList />
-          <BoardList />
-          <AddBoardListDialog />
+      {!user?.activeBoard ? (
+        <p className="my-auto mx-auto">No Active board</p>
+      ) : (
+        <div className="flex-1 min-h-0">
+          <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
+            {/* List */}
+            <BoardList />
+            <BoardList />
+            <AddBoardListDialog />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
