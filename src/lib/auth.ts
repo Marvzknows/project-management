@@ -35,3 +35,18 @@ export const auth = betterAuth({
 
 export type SessionT = typeof auth.$Infer.Session.session;
 export type UserT = typeof auth.$Infer.Session.user;
+export type MeApi = {
+  id: string;
+  createdAt: Date;
+  email: string;
+  name: string;
+  image: string | null;
+  activeBoardId: string | null;
+  activeBoard: {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    title: string;
+    ownerId: string;
+  } | null;
+};

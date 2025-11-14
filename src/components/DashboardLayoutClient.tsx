@@ -15,7 +15,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { signOut, useSession } from "@/lib/auth-client";
+import { signOut } from "@/lib/auth-client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
@@ -24,25 +24,30 @@ import FullPageError from "./FullPageError";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "@/context/auth/AuthContext";
 import ProfileDropdowMenu from "./ProfileDropdownMenu";
+import { MeApi } from "@/lib/auth";
+import { useQuery } from "@tanstack/react-query";
+import { meApi } from "@/lib/axios/api/auth";
 
 export default function DashboardLayoutClient({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { setUserAuth, setSessionAuth } = useContext(AuthContext);
+  const { setUserAuth } = useContext(AuthContext);
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data, isPending, error, refetch } = useSession();
+  const { data, isFetching, error, refetch } = useQuery<MeApi>({
+    queryKey: ["meApi"],
+    queryFn: async () => await meApi(),
+  });
 
   // Store session and user data in context when available
   useEffect(() => {
     if (data) {
-      setUserAuth(data.user || null);
-      setSessionAuth(data.session || null);
+      setUserAuth(data || null);
     }
-  }, [data, setUserAuth, setSessionAuth]);
+  }, [data, setUserAuth]);
 
   const handleSignOut = async () => {
     const { error } = await signOut();
@@ -57,7 +62,7 @@ export default function DashboardLayoutClient({
     }
   };
 
-  if (isPending) {
+  if (isFetching) {
     return <FullPageLoader />;
   }
 

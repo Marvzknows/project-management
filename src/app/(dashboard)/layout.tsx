@@ -7,8 +7,8 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <DashboardLayoutClient>
-      <QueryProvider>{children}</QueryProvider>
-    </DashboardLayoutClient>
+    <QueryProvider>
+      <DashboardLayoutClient>{children}</DashboardLayoutClient>
+    </QueryProvider>
   );
 }
