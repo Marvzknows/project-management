@@ -4,7 +4,9 @@ import { createContext } from "react";
 export type AuthContextType = {
   user: MeApi | null;
   session: SessionT | null;
-  setUserAuth: (user: MeApi | null) => void;
+  setUserAuth: (
+    value: MeApi | ((prev: MeApi | null) => MeApi | null) | null
+  ) => void;
   setSessionAuth: (user: SessionT | null) => void;
 };
 

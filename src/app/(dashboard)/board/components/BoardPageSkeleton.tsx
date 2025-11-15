@@ -4,9 +4,8 @@ const BoardPageSkeleton = () => {
   return (
     <div className="p-4 h-full flex flex-col">
       {/* Header section */}
-      <div className="flex items-center justify-between border-b border-border pb-2">
+      {/* <div className="flex items-center justify-between border-b border-border pb-2">
         <div className="flex items-center gap-2">
-          {/* BoardListComboBox + CreateBoardDialog */}
           <Skeleton className="h-9 w-40 rounded-md" />
           <Skeleton className="h-9 w-28 rounded-md" />
         </div>
@@ -18,7 +17,7 @@ const BoardPageSkeleton = () => {
           </div>
           <Skeleton className="h-9 w-28 rounded-md" />
         </div>
-      </div>
+      </div> */}
 
       {/* Board lists area */}
       <div className="flex-1 min-h-0">

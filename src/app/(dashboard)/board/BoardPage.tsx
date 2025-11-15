@@ -17,7 +17,6 @@ const BoardPage = () => {
   const { user } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
   const [searchBoard, setSearchBoard] = useState("");
-  const [selectedBoard, setSelectedBoard] = useState("");
   const debouncedSearch = useDebounce(searchBoard, 500);
 
   // #region API
@@ -43,8 +42,6 @@ const BoardPage = () => {
     );
   }, [boardListData]);
 
-  if (isLoadingBoardData) return <BoardPageSkeleton />;
-
   if (isErrorBoardList || isErrorBoardData) return <FullPageError />;
 
   return (
@@ -57,10 +54,11 @@ const BoardPage = () => {
             searchBoard={searchBoard}
             setSearchBoard={setSearchBoard}
             isSearching={isLoadingBoardList}
-            selectedBoard={selectedBoard}
-            setSelectedBoard={setSelectedBoard}
+            isLoading={isLoadingBoardData || isLoadingBoardList}
           />
-          <CreateBoardDialog />
+          <CreateBoardDialog
+            isLoading={isLoadingBoardData || isLoadingBoardList}
+          />
         </div>
         <div className="flex items-center gap-2">
           <AvatarStacked />
@@ -69,7 +67,9 @@ const BoardPage = () => {
       </div>
 
       {/* Board */}
-      {!user?.activeBoard ? (
+      {isLoadingBoardData ? (
+        <BoardPageSkeleton />
+      ) : !user?.activeBoardId ? (
         <p className="my-auto mx-auto">No Active board</p>
       ) : (
         <div className="flex-1 min-h-0">

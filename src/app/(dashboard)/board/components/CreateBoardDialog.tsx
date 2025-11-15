@@ -14,7 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-const CreateBoardDialog = () => {
+type Props = {
+  isLoading: boolean;
+};
+const CreateBoardDialog = ({ isLoading }: Props) => {
   const [open, setOpen] = React.useState(false);
 
   const {
@@ -38,7 +41,7 @@ const CreateBoardDialog = () => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger disabled={isLoading} asChild>
         <Button>Create Board</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -64,6 +67,7 @@ const CreateBoardDialog = () => {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>

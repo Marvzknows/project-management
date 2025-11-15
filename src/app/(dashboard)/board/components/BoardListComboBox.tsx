@@ -15,7 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "@/context/auth/AuthContext";
 
 export type BoardListComboBoxProps = {
   options: {
@@ -25,8 +26,7 @@ export type BoardListComboBoxProps = {
   searchBoard: string;
   setSearchBoard: React.Dispatch<React.SetStateAction<string>>;
   isSearching: boolean;
-  selectedBoard: string;
-  setSelectedBoard: React.Dispatch<React.SetStateAction<string>>;
+  isLoading: boolean;
 };
 
 const BoardListComboBox = ({
@@ -34,17 +34,18 @@ const BoardListComboBox = ({
   searchBoard,
   setSearchBoard,
   isSearching,
-  selectedBoard,
-  setSelectedBoard,
+  isLoading,
 }: BoardListComboBoxProps) => {
+  const { user, setUserAuth } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
 
   const selectedLabel =
-    options.find((b) => b.value === selectedBoard)?.label || "Select board...";
+    options.find((b) => b.value === user?.activeBoardId)?.label ||
+    "Select board...";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger disabled={isLoading} asChild>
         <Button
           variant="outline"
           role="combobox"
@@ -86,8 +87,8 @@ const BoardListComboBox = ({
                       key={b.value}
                       value={b.value}
                       onSelect={(currentValue) => {
-                        setSelectedBoard(
-                          currentValue === selectedBoard ? "" : currentValue
+                        setUserAuth((prev) =>
+                          prev ? { ...prev, activeBoardId: currentValue } : null
                         );
                         setOpen(false);
                       }}
@@ -96,7 +97,7 @@ const BoardListComboBox = ({
                       <Check
                         className={cn(
                           "ml-auto transition-opacity",
-                          selectedBoard === b.value
+                          user?.activeBoardId === b.value
                             ? "opacity-100"
                             : "opacity-0"
                         )}
