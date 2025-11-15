@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/popover";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/auth/AuthContext";
+import { useUpdateUserActiveBoard } from "@/hooks/boardHooks";
+import { toast } from "sonner";
 
 export type BoardListComboBoxProps = {
   options: {
@@ -39,13 +41,24 @@ const BoardListComboBox = ({
   const { user, setUserAuth } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
 
+  const { mutate, isPending } = useUpdateUserActiveBoard();
+
+  const handleSelectBoard = (boardId: string) => {
+    setUserAuth((prev) => (prev ? { ...prev, activeBoardId: boardId } : null));
+    mutate(boardId, {
+      onSuccess: () => toast.success("Board updated"),
+      onError: () => toast.error("Updating active board failed"),
+    });
+    setOpen(false);
+  };
+
   const selectedLabel =
     options.find((b) => b.value === user?.activeBoardId)?.label ||
     "Select board...";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger disabled={isLoading} asChild>
+      <PopoverTrigger disabled={isLoading || isPending} asChild>
         <Button
           variant="outline"
           role="combobox"
@@ -86,12 +99,7 @@ const BoardListComboBox = ({
                     <CommandItem
                       key={b.value}
                       value={b.value}
-                      onSelect={(currentValue) => {
-                        setUserAuth((prev) =>
-                          prev ? { ...prev, activeBoardId: currentValue } : null
-                        );
-                        setOpen(false);
-                      }}
+                      onSelect={handleSelectBoard}
                     >
                       {b.label}
                       <Check

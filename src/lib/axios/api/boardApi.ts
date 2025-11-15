@@ -8,3 +8,7 @@ export const getBoardListApi = async (params: UseBoardParamsT) => {
 export const getBoardApi = async (id: string) => {
   return await apiClient.get<BoardIsAllT>(`/board/${id}`);
 };
+
+export const updateUserActiveBoardApi = async (boardId: string) => {
+  return await apiClient.put(`/board/${boardId}`);
+};
