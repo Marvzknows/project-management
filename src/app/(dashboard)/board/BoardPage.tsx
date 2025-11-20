@@ -60,7 +60,7 @@ const BoardPage = () => {
           />
         </div>
         <div className="flex items-center gap-2">
-          <AvatarStacked />
+          <AvatarStacked users={boardData?.data.members || []} />
           <AddMemberDialog isOpen={isOpen} setIsOpen={setIsOpen} />
         </div>
       </div>
@@ -75,7 +75,7 @@ const BoardPage = () => {
           <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
             {/* List */}
             {boardData?.data.List.map((list) => (
-              <BoardList key={list.id} />
+              <BoardList key={list.id} list={list} />
             ))}
             <AddBoardListDialog boardId={user.activeBoardId} />
           </div>

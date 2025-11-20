@@ -11,7 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import TaskCard from "./TaskCard";
 import AddCardDialog from "./AddCardDialog";
-const BoardList = () => {
+import { ListT } from "@/types/list";
+
+type Props = {
+  list: ListT;
+};
+const BoardList = ({ list }: Props) => {
   const [openAddCard, setOpenAddCard] = useState(false);
   const membersOptions = [
     { id: "1", name: "Marvin Lim" },
@@ -21,7 +26,7 @@ const BoardList = () => {
   return (
     <div className="min-w-[380px] max-w-[380px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
       <div className="flex items-center justify-between sticky top-0 bg-secondary z-10 pb-2">
-        <h2 className="text-lg">List Name</h2>
+        <h2 className="text-lg">{list.title}</h2>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -57,11 +62,17 @@ const BoardList = () => {
       </div>
 
       {/* Example task cards */}
-      <TaskCard priority={"NONE"} />
-      <TaskCard priority={"LOW"} />
+      {list.cards.length === 0 ? (
+        <p className="border rounded p-2 text-xs dark:bg-black bg-slate-100">
+          No task found
+        </p>
+      ) : (
+        <TaskCard priority={"NONE"} />
+      )}
+      {/* <TaskCard priority={"LOW"} />
       <TaskCard priority={"HIGH"} />
       <TaskCard priority={"URGENT"} />
-      <TaskCard priority={"VERY HIGH"} />
+      <TaskCard priority={"VERY HIGH"} /> */}
 
       <AddCardDialog
         open={openAddCard}
