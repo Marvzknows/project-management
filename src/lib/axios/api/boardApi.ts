@@ -1,4 +1,4 @@
-import { BoardIsAllT, UseBoardParamsT } from "@/types/board";
+import { BoardIsAllT, UseBoardParamsT, UserBoardDataT } from "@/types/board";
 import { apiClient } from "../apiClient";
 
 export const getBoardListApi = async (params: UseBoardParamsT) => {
@@ -6,7 +6,7 @@ export const getBoardListApi = async (params: UseBoardParamsT) => {
 };
 
 export const getBoardApi = async (id: string) => {
-  return await apiClient.get<BoardIsAllT>(`/board/${id}`);
+  return await apiClient.get<UserBoardDataT>(`/board/${id}`);
 };
 
 export const updateUserActiveBoardApi = async (boardId: string) => {

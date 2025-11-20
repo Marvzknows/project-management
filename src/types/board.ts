@@ -1,3 +1,5 @@
+import { List } from "@/generated/prisma";
+
 export type UseBoardParamsT = {
   isAll?: boolean;
   search?: string;
@@ -21,4 +23,32 @@ export type BoardIsAllT = {
     ownerId: string;
   }[];
   meta?: MetaT;
+};
+
+export type BoardUsersT = {
+  id: string;
+  image: string;
+  name: string;
+  email: string;
+};
+
+export type BoardOwnerT = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
+  activeBoardId: string;
+};
+
+export type UserBoardDataT = {
+  data: {
+    title: string;
+    List: List[];
+    activeUsers: BoardUsersT[];
+    members: BoardUsersT[];
+    owner: BoardOwnerT;
+  };
 };

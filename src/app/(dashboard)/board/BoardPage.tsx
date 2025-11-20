@@ -27,12 +27,11 @@ const BoardPage = () => {
   } = useBoardList({ isAll: true, search: debouncedSearch });
 
   const {
-    data: _boardData,
+    data: boardData,
     isLoading: isLoadingBoardData,
     isError: isErrorBoardData,
   } = useBoard(user?.activeBoardId);
   // #endregion
-
   const boardOptions = useMemo(() => {
     return (
       boardListData?.data.map((b) => ({
@@ -75,8 +74,9 @@ const BoardPage = () => {
         <div className="flex-1 min-h-0">
           <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
             {/* List */}
-            <BoardList />
-            <BoardList />
+            {boardData?.data.List.map((list) => (
+              <BoardList key={list.id} />
+            ))}
             <AddBoardListDialog />
           </div>
         </div>
