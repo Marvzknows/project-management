@@ -1,4 +1,4 @@
-import { List } from "@/generated/prisma";
+import { ListT } from "./list";
 
 export type UseBoardParamsT = {
   isAll?: boolean;
@@ -46,7 +46,7 @@ export type BoardOwnerT = {
 export type UserBoardDataT = {
   data: {
     title: string;
-    List: List[];
+    List: ListT[];
     activeUsers: BoardUsersT[];
     members: BoardUsersT[];
     owner: BoardOwnerT;

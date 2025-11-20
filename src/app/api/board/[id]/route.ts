@@ -31,7 +31,19 @@ export const GET = async (
             image: true,
           },
         },
-        List: true,
+        List: {
+          orderBy: { position: "asc" },
+          select: {
+            id: true,
+            title: true,
+            createdAt: true,
+            updatedAt: true,
+            position: true,
+            boardId: true,
+            createdById: true,
+            cards: true,
+          },
+        },
         activeUsers: {
           select: {
             id: true,
