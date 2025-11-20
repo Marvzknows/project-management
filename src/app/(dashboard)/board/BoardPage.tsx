@@ -77,7 +77,7 @@ const BoardPage = () => {
             {boardData?.data.List.map((list) => (
               <BoardList key={list.id} />
             ))}
-            <AddBoardListDialog />
+            <AddBoardListDialog boardId={user.activeBoardId} />
           </div>
         </div>
       )}
