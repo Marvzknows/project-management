@@ -12,3 +12,7 @@ export const getBoardApi = async (id: string) => {
 export const updateUserActiveBoardApi = async (boardId: string) => {
   return await apiClient.put(`/board/${boardId}`);
 };
+
+export const createBoardApi = async (boardName: string) => {
+  return await apiClient.post(`/board`, { title: boardName });
+};

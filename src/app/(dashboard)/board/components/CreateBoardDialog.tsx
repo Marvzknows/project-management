@@ -13,12 +13,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { useCreateBoard } from "@/hooks/boardHooks";
+import { toast } from "sonner";
 
 type Props = {
   isLoading: boolean;
 };
 const CreateBoardDialog = ({ isLoading }: Props) => {
   const [open, setOpen] = React.useState(false);
+  const { mutate, isPending } = useCreateBoard();
 
   const {
     register,
@@ -30,9 +33,15 @@ const CreateBoardDialog = ({ isLoading }: Props) => {
   });
 
   const onSubmit = (data: { title: string }) => {
-    console.log("Board Created:", data);
-    reset();
-    setOpen(false);
+    console.log("Board Created:", data.title);
+    mutate(data.title, {
+      onSuccess: () => {
+        reset();
+        setOpen(false);
+        toast.success("Board created");
+      },
+      onError: () => toast.error("Creating board failed"),
+    });
   };
 
   React.useEffect(() => {
@@ -41,7 +50,7 @@ const CreateBoardDialog = ({ isLoading }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger disabled={isLoading} asChild>
+      <DialogTrigger disabled={isLoading || isPending} asChild>
         <Button>Create Board</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -67,11 +76,13 @@ const CreateBoardDialog = ({ isLoading }: Props) => {
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
-              disabled={isLoading}
+              disabled={isLoading || isPending}
             >
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button disabled={isLoading || isPending} type="submit">
+              Create
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -129,7 +129,7 @@ export default function DashboardLayoutClient({
           {children}
         </div>
       </SidebarInset>
-      <Toaster richColors position="top-right" />
+      <Toaster richColors position="bottom-right" />
     </SidebarProvider>
   );
 }
