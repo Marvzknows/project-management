@@ -15,3 +15,8 @@ export type ListT = {
   createdById: string;
   cards: Card[]; // temporary
 };
+
+export type UpdateListPositionT = {
+  listId: string;
+  position: number;
+};

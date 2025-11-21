@@ -26,6 +26,8 @@ import {
 } from "@dnd-kit/sortable";
 import { ListT } from "@/types/list";
 import SortableBoardList from "./components/dnd/SortableBoardList";
+import { useUpdateListPosition } from "@/hooks/listHooks";
+import { toast } from "sonner";
 
 const BoardPage = () => {
   const { user } = useContext(AuthContext);
@@ -45,6 +47,8 @@ const BoardPage = () => {
     isLoading: isLoadingBoardData,
     isError: isErrorBoardData,
   } = useBoard(user?.activeBoardId);
+
+  const { mutate: updateBoardListOrderMutation } = useUpdateListPosition();
   // #endregion
   const boardOptions = useMemo(() => {
     return (
@@ -83,7 +87,10 @@ const BoardPage = () => {
     setLists(newOrder);
 
     // OPTIONAL: update order in database
-    // await updateBoardListOrderMutation.mutateAsync(newOrder);
+    updateBoardListOrderMutation(
+      { listId: String(active.id), position: newIndex + 1 },
+      { onError: () => toast.error("Updating list position failed") }
+    );
   };
 
   return (
