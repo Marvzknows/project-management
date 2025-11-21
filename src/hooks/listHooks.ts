@@ -13,11 +13,9 @@ export const useCreateList = () => {
 };
 
 export const useUpdateListPosition = () => {
-  // const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: UpdateListPositionT) => {
       return await updateListPositionApi(payload);
     },
-    // onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
   });
 };

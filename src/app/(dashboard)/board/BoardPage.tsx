@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import BoardListComboBox from "./components/BoardListComboBox";
 import AddMemberDialog from "./components/AddMemberDialog";
 import AvatarStacked from "./components/AvatarStacked";
@@ -95,6 +95,8 @@ const BoardPage = () => {
     );
   };
 
+  const refetchTimeoutRef = useRef<NodeJS.Timeout>(null);
+
   useEffect(() => {
     if (!user?.activeBoardId) return;
 
@@ -108,14 +110,26 @@ const BoardPage = () => {
           table: "List",
         },
         async (payload) => {
-          console.log("PAYLOAD: ", payload);
-          await refetchBoard();
+          console.log("🔥 Event received:", payload);
+
+          // Clear existing timeout
+          if (refetchTimeoutRef.current) {
+            clearTimeout(refetchTimeoutRef.current);
+          }
+
+          // Set new timeout - only refetch after 300ms of no more events
+          refetchTimeoutRef.current = setTimeout(async () => {
+            await refetchBoard();
+          }, 300);
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (refetchTimeoutRef.current) {
+        clearTimeout(refetchTimeoutRef.current);
+      }
+      channel.unsubscribe();
     };
   }, [user?.activeBoardId]);
 
