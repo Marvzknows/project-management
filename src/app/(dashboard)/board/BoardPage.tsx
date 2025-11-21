@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import BoardListComboBox from "./components/BoardListComboBox";
 import AddMemberDialog from "./components/AddMemberDialog";
 import AvatarStacked from "./components/AvatarStacked";
-import BoardList from "./components/BoardList";
 import AddBoardListDialog from "./components/AddBoardListDialog";
 import CreateBoardDialog from "./components/CreateBoardDialog";
 import { useBoard, useBoardList } from "@/hooks/boardHooks";
@@ -12,6 +11,21 @@ import FullPageError from "@/components/FullPageError";
 import BoardPageSkeleton from "./components/BoardPageSkeleton";
 import { useDebounce } from "@/hooks/useDebounce";
 import { AuthContext } from "@/context/auth/AuthContext";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { ListT } from "@/types/list";
+import SortableBoardList from "./components/dnd/SortableBoardList";
 
 const BoardPage = () => {
   const { user } = useContext(AuthContext);
@@ -43,6 +57,35 @@ const BoardPage = () => {
 
   if (isErrorBoardList || isErrorBoardData) return <FullPageError />;
 
+  const [lists, setLists] = useState<ListT[]>([]);
+
+  useEffect(() => {
+    if (boardData?.data.List) {
+      setLists(boardData.data.List);
+    }
+  }, [boardData]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = lists.findIndex((l) => l.id === active.id);
+    const newIndex = lists.findIndex((l) => l.id === over.id);
+
+    const newOrder = arrayMove(lists, oldIndex, newIndex);
+    setLists(newOrder);
+
+    // OPTIONAL: update order in database
+    // await updateBoardListOrderMutation.mutateAsync(newOrder);
+  };
+
   return (
     <div className="p-4 h-full flex flex-col">
       {/* Board name & board list */}
@@ -72,13 +115,24 @@ const BoardPage = () => {
         <p className="my-auto mx-auto">No Active board</p>
       ) : (
         <div className="flex-1 min-h-0">
-          <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
-            {/* List */}
-            {boardData?.data.List.map((list) => (
-              <BoardList key={list.id} list={list} />
-            ))}
-            <AddBoardListDialog boardId={user.activeBoardId} />
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={lists.map((l) => l.id)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <div className="relative flex gap-1.5 overflow-x-auto h-full pb-2 p-2.5 shadow">
+                {lists.map((list) => (
+                  <SortableBoardList key={list.id} list={list} />
+                ))}
+
+                <AddBoardListDialog boardId={user.activeBoardId} />
+              </div>
+            </SortableContext>
+          </DndContext>
         </div>
       )}
     </div>
