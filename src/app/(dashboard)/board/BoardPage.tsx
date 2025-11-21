@@ -28,6 +28,7 @@ import { ListT } from "@/types/list";
 import SortableBoardList from "./components/dnd/SortableBoardList";
 import { useUpdateListPosition } from "@/hooks/listHooks";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase/supabaseClient";
 
 const BoardPage = () => {
   const { user } = useContext(AuthContext);
@@ -46,6 +47,7 @@ const BoardPage = () => {
     data: boardData,
     isLoading: isLoadingBoardData,
     isError: isErrorBoardData,
+    refetch: refetchBoard,
   } = useBoard(user?.activeBoardId);
 
   const { mutate: updateBoardListOrderMutation } = useUpdateListPosition();
@@ -92,6 +94,30 @@ const BoardPage = () => {
       { onError: () => toast.error("Updating list position failed") }
     );
   };
+
+  useEffect(() => {
+    if (!user?.activeBoardId) return;
+
+    const channel = supabase
+      .channel(`board-${user.activeBoardId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "List",
+        },
+        async (payload) => {
+          console.log("PAYLOAD: ", payload);
+          await refetchBoard();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.activeBoardId]);
 
   return (
     <div className="p-4 h-full flex flex-col">
