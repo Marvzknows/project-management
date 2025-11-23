@@ -20,3 +20,8 @@ export type UpdateListPositionT = {
   listId: string;
   position: number;
 };
+
+export type UpdateListTitleT = {
+  listId: string;
+  title: string;
+};

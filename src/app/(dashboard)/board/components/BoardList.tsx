@@ -12,12 +12,14 @@ import { Button } from "@/components/ui/button";
 import TaskCard from "./TaskCard";
 import AddCardDialog from "./AddCardDialog";
 import { ListT } from "@/types/list";
+import EditListTitleDialog from "./EditListTitleDialog";
 
 type Props = {
   list: ListT;
 };
 const BoardList = ({ list }: Props) => {
   const [openAddCard, setOpenAddCard] = useState(false);
+  const [openEditListTitle, setOpenEditListTitle] = useState(false);
   const membersOptions = [
     { id: "1", name: "Marvin Lim" },
     { id: "2", name: "John Doe" },
@@ -48,7 +50,10 @@ const BoardList = ({ list }: Props) => {
               Add card
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="text-blue-500 hover:text-white">
+            <DropdownMenuItem
+              className="text-blue-500 hover:text-white"
+              onClick={() => setOpenEditListTitle(true)}
+            >
               <Pencil className="text-blue-500 hover:text-white" />
               Edit list
             </DropdownMenuItem>
@@ -77,8 +82,15 @@ const BoardList = ({ list }: Props) => {
       <AddCardDialog
         open={openAddCard}
         onOpenChange={setOpenAddCard}
-        listId={""}
+        listId={list.id}
         users={membersOptions}
+      />
+
+      <EditListTitleDialog
+        open={openEditListTitle}
+        onOpenChange={setOpenEditListTitle}
+        currentTitle={list.title}
+        listId={list.id}
       />
     </div>
   );
