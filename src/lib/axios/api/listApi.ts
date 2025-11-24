@@ -23,3 +23,7 @@ export const updateListTitleApi = async (payload: UpdateListTitleT) => {
     title: payload.title,
   });
 };
+
+export const deleteListApi = async (listId: string) => {
+  return await apiClient.delete(`/list/${listId}`);
+};

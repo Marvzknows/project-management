@@ -1,5 +1,6 @@
 import {
   createListApi,
+  deleteListApi,
   updateListPositionApi,
   updateListTitleApi,
 } from "@/lib/axios/api/listApi";
@@ -32,6 +33,14 @@ export const useUpdateListTitle = () => {
   return useMutation({
     mutationFn: async (payload: UpdateListTitleT) => {
       return await updateListTitleApi(payload);
+    },
+  });
+};
+
+export const useDeleteList = () => {
+  return useMutation({
+    mutationFn: async (listId: string) => {
+      return await deleteListApi(listId);
     },
   });
 };

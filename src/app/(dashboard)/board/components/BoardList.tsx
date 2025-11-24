@@ -13,6 +13,7 @@ import TaskCard from "./TaskCard";
 import AddCardDialog from "./AddCardDialog";
 import { ListT } from "@/types/list";
 import EditListTitleDialog from "./EditListTitleDialog";
+import DeleteListDialog from "./DeleteListDialog";
 
 type Props = {
   list: ListT;
@@ -20,6 +21,7 @@ type Props = {
 const BoardList = ({ list }: Props) => {
   const [openAddCard, setOpenAddCard] = useState(false);
   const [openEditListTitle, setOpenEditListTitle] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const membersOptions = [
     { id: "1", name: "Marvin Lim" },
     { id: "2", name: "John Doe" },
@@ -58,7 +60,10 @@ const BoardList = ({ list }: Props) => {
               Edit list
             </DropdownMenuItem>
 
-            <DropdownMenuItem className="text-red-500 hover:text-white">
+            <DropdownMenuItem
+              className="text-red-500 hover:text-white"
+              onClick={() => setOpenDelete(true)}
+            >
               <Trash className="text-red-500 hover:text-white" />
               Delete list
             </DropdownMenuItem>
@@ -90,6 +95,12 @@ const BoardList = ({ list }: Props) => {
         open={openEditListTitle}
         onOpenChange={setOpenEditListTitle}
         currentTitle={list.title}
+        listId={list.id}
+      />
+
+      <DeleteListDialog
+        open={openDelete}
+        onOpenChange={setOpenDelete}
         listId={list.id}
       />
     </div>
