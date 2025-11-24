@@ -2,7 +2,8 @@ import axios from "axios";
 
 // Create axios instance with base configuration
 export const axiosInstance = axios.create({
-  baseURL: process.env.BETTER_AUTH_URL || "/api",
+  // baseURL: process.env.BETTER_AUTH_URL || "/api",
+  baseURL: "/api",
   //   timeout: 10000, 10 secss
   headers: {
     "Content-Type": "application/json",
