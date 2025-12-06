@@ -32,7 +32,6 @@ import { supabase } from "@/lib/supabase/supabaseClient";
 
 const BoardPage = () => {
   const { user } = useContext(AuthContext);
-  const [isOpen, setIsOpen] = useState(false);
   const [searchBoard, setSearchBoard] = useState("");
   const debouncedSearch = useDebounce(searchBoard, 500);
 
@@ -151,7 +150,7 @@ const BoardPage = () => {
         </div>
         <div className="flex items-center gap-2">
           <AvatarStacked users={boardData?.data.members || []} />
-          <AddMemberDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+          <AddMemberDialog />
         </div>
       </div>
 

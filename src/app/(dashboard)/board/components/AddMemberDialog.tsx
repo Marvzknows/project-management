@@ -9,27 +9,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ChevronsUpDown, Plus } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Plus } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
-type Props = {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const AddMemberDialog = ({ isOpen, setIsOpen }: Props) => {
+const AddMemberDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -51,62 +35,16 @@ const AddMemberDialog = ({ isOpen, setIsOpen }: Props) => {
               htmlFor="member"
               className="text-sm font-medium flex items-center gap-1"
             >
-              Member Name
+              Email
             </Label>
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={isOpen}
-                  className="justify-between"
-                >
-                  Select user
-                  <ChevronsUpDown className="opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[250px] p-0">
-                <Command shouldFilter={false}>
-                  <CommandInput
-                    placeholder="Search user..."
-                    className="h-9"
-                    //   onValueChange={setSearch} // Update search state directly
-                  />
-                  <CommandList>
-                    <CommandEmpty>No user found.</CommandEmpty>
-                    <CommandGroup>
-                      {/* {data?.data.users?.map((user) => (
-                          <CommandItem
-                            key={user.id}
-                            value={user.id}
-                            onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? "" : currentValue
-                              );
-                              setOpen(false);
-                            }}
-                          >
-                            {user.first_name} {user.last_name}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                value === user.id ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))} */}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <Input placeholder="Enter email" />
           </div>
         </div>
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button type="submit">Add user</Button>
+          <Button type="submit">Add</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
