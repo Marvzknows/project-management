@@ -59,7 +59,10 @@ export const GET = async (
       return NextResponse.json({ error: "Board not found" }, { status: 404 });
     }
 
-    if (board?.owner.id !== session.user.id) {
+    const isMember = board.members.some(
+      (member) => member.id === session.user.id
+    );
+    if (!isMember) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
