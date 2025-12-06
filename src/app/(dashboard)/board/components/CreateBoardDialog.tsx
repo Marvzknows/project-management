@@ -33,7 +33,6 @@ const CreateBoardDialog = ({ isLoading }: Props) => {
   });
 
   const onSubmit = (data: { title: string }) => {
-    console.log("Board Created:", data.title);
     mutate(data.title, {
       onSuccess: () => {
         reset();

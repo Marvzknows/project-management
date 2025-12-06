@@ -1,10 +1,11 @@
 import {
+  addBoardMemberApi,
   createBoardApi,
   getBoardApi,
   getBoardListApi,
   updateUserActiveBoardApi,
 } from "@/lib/axios/api/boardApi";
-import { UseBoardParamsT } from "@/types/board";
+import { AddMemberPayloadT, UseBoardParamsT } from "@/types/board";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useBoardList = (params: UseBoardParamsT) => {
@@ -41,5 +42,15 @@ export const useCreateBoard = () => {
       return await createBoardApi(boardName);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardList"] }),
+  });
+};
+
+export const useAddBoardMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: AddMemberPayloadT) => {
+      return await addBoardMemberApi(payload);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
   });
 };

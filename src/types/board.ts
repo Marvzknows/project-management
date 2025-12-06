@@ -52,3 +52,8 @@ export type UserBoardDataT = {
     owner: BoardOwnerT;
   };
 };
+
+export type AddMemberPayloadT = {
+  boardId: string;
+  email: string;
+};
