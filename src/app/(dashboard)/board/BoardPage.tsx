@@ -87,7 +87,7 @@ const BoardPage = () => {
     const newOrder = arrayMove(lists, oldIndex, newIndex);
     setLists(newOrder);
 
-    // OPTIONAL: update order in database
+    //update order in database
     updateBoardListOrderMutation(
       { listId: String(active.id), position: newIndex + 1 },
       { onError: () => toast.error("Updating list position failed") }
@@ -107,9 +107,10 @@ const BoardPage = () => {
           event: "*",
           schema: "public",
           table: "List",
+          filter: `boardId=eq.${user.activeBoardId}`,
         },
         async (payload) => {
-          console.log("🔥 Event received:", payload);
+          console.log("Event received:", payload);
 
           // Clear existing timeout
           if (refetchTimeoutRef.current) {
