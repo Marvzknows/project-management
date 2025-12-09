@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 type AddCardDialogProps = {
   open: boolean;
@@ -94,7 +94,7 @@ const AddCardDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
           <DialogTitle>Add New Card</DialogTitle>
           <DialogDescription>
@@ -117,19 +117,10 @@ const AddCardDialog = ({
             />
           </div>
 
-          {/* Description */}
+          {/* TextEdit */}
           <div className="grid gap-3">
             <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Optional description"
-              className="min-h-24"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, description: e.target.value }))
-              }
-            />
+            <SimpleEditor />
           </div>
 
           {/* Assignees (multi-select combobox) */}
