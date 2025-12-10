@@ -22,10 +22,6 @@ const BoardList = ({ list }: Props) => {
   const [openAddCard, setOpenAddCard] = useState(false);
   const [openEditListTitle, setOpenEditListTitle] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const membersOptions = [
-    { id: "1", name: "Marvin Lim" },
-    { id: "2", name: "John Doe" },
-  ];
 
   return (
     <div className="min-w-[380px] max-w-[380px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
@@ -88,7 +84,6 @@ const BoardList = ({ list }: Props) => {
         open={openAddCard}
         onOpenChange={setOpenAddCard}
         listId={list.id}
-        users={membersOptions}
       />
 
       <EditListTitleDialog

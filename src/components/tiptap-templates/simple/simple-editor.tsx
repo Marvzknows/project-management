@@ -35,7 +35,7 @@ import "@/components/tiptap-node/heading-node/heading-node.scss";
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
 
 // --- Tiptap UI ---
-import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
+// import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu";
 import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button";
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu";
 import { BlockquoteButton } from "@/components/tiptap-ui/blockquote-button";
@@ -72,6 +72,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
+import { HeadingButton } from "@/components/tiptap-ui/heading-button";
 
 // import content from "@/components/tiptap-templates/simple/data/content.json";
 
@@ -96,7 +97,10 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} portal={true} />
+        <HeadingButton level={1} />
+        <HeadingButton level={2} />
+        <HeadingButton level={3} />
+        <HeadingButton level={4} />
         <ListDropdownMenu
           types={["bulletList", "orderedList", "taskList"]}
           portal={true}
@@ -243,7 +247,7 @@ export function SimpleEditor() {
   }, [isMobile, mobileView]);
 
   return (
-    <div className="simple-editor-wrapper">
+    <div className="simple-editor-wrapper border rounded">
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}
