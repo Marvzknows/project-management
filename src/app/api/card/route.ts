@@ -15,7 +15,7 @@ export const POST = async (req: NextRequest) => {
 
     const body = await req.json();
 
-    const { boardId, title, description, listId, priority } = body;
+    const { boardId, title, description, listId, priority, assignees } = body;
 
     if (!title || !listId || !boardId || !priority) {
       return NextResponse.json(
@@ -53,6 +53,11 @@ export const POST = async (req: NextRequest) => {
         priority,
         createdById: session.user.id,
         position: nextPosition,
+        assignees: assignees?.length
+          ? {
+              connect: assignees.map((id: string) => ({ id })),
+            }
+          : undefined,
       },
     });
 

@@ -38,6 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CardFormDataT } from "@/lib/axios/api/cardApi";
 
 type AddCardDialogProps = {
   open: boolean;
@@ -48,12 +49,14 @@ type AddCardDialogProps = {
 const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
   const { user } = useContext(AuthContext);
   const { data, isLoading } = useBoardMembersList(user?.activeBoardId);
-  const [formData, setFormData] = useState({
+  const initialFormData: CardFormDataT = {
+    boardId: "",
     title: "",
-    description: "",
-    assigneeIds: [] as string[],
+    listId: "",
     priority: "",
-  });
+    assigneeIds: [],
+  };
+  const [formData, setFormData] = useState<CardFormDataT>(initialFormData);
   const [openPopover, setOpenPopover] = useState(false);
 
   const toggleAssignee = (userId: string) => {
@@ -69,32 +72,21 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    alert(
-      JSON.stringify({
-        title: formData.title,
-        description: formData.description,
-        listId,
-        assigneeIds: formData.assigneeIds,
-        priority: formData.priority,
-      })
-    );
+    if (!user?.activeBoardId) return;
 
-    console.log({
+    const payload: CardFormDataT = {
+      boardId: user.activeBoardId,
       title: formData.title,
-      description: formData.description,
-      listId,
-      assigneeIds: formData.assigneeIds,
+      listId: listId,
       priority: formData.priority,
-    });
+      assigneeIds: formData.assigneeIds,
+    };
+
+    console.log(payload);
   };
 
   useEffect(() => {
-    setFormData({
-      title: "",
-      description: "",
-      assigneeIds: [] as string[],
-      priority: "",
-    });
+    setFormData(initialFormData);
   }, [open]);
 
   return (
