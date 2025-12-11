@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { CirclePlus, MoreHorizontalIcon, Pencil, Trash } from "lucide-react";
+import {
+  CirclePlus,
+  GripVertical,
+  MoreHorizontalIcon,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,11 +20,14 @@ import AddCardDialog from "./AddCardDialog";
 import { ListT } from "@/types/list";
 import EditListTitleDialog from "./EditListTitleDialog";
 import DeleteListDialog from "./DeleteListDialog";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 type Props = {
   list: ListT;
+  dragHandleListeners?: SyntheticListenerMap;
 };
-const BoardList = ({ list }: Props) => {
+
+const BoardList = ({ list, dragHandleListeners }: Props) => {
   const [openAddCard, setOpenAddCard] = useState(false);
   const [openEditListTitle, setOpenEditListTitle] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -26,7 +35,16 @@ const BoardList = ({ list }: Props) => {
   return (
     <div className="min-w-[380px] max-w-[380px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
       <div className="flex items-center justify-between sticky top-0 bg-secondary z-10 pb-2">
-        <h2 className="text-lg">{list.title}</h2>
+        {/* Drag Handle */}
+        <div className="flex items-center gap-2">
+          <div
+            {...dragHandleListeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded"
+          >
+            <GripVertical className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <h2 className="text-lg">{list.title}</h2>
+        </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -73,12 +91,8 @@ const BoardList = ({ list }: Props) => {
           No task found
         </p>
       ) : (
-        <TaskCard priority={"NONE"} />
+        list.cards.map((a) => <TaskCard key={a.id} priority={a.priority} />)
       )}
-      {/* <TaskCard priority={"LOW"} />
-      <TaskCard priority={"HIGH"} />
-      <TaskCard priority={"URGENT"} />
-      <TaskCard priority={"VERY HIGH"} /> */}
 
       <AddCardDialog
         open={openAddCard}

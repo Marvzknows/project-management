@@ -6,7 +6,7 @@ export type CardFormDataT = {
   listId: string;
   priority: string;
   assigneeIds: string[];
-  // description
+  description: string;
 };
 
 export const createCardApi = async (payload: CardFormDataT) => {

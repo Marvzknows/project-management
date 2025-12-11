@@ -39,6 +39,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CardFormDataT } from "@/lib/axios/api/cardApi";
+import { useCreateCard } from "@/hooks/cardHooks";
+import { toast } from "sonner";
 
 type AddCardDialogProps = {
   open: boolean;
@@ -55,9 +57,11 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
     listId: "",
     priority: "",
     assigneeIds: [],
+    description: "",
   };
   const [formData, setFormData] = useState<CardFormDataT>(initialFormData);
   const [openPopover, setOpenPopover] = useState(false);
+  const { mutate: createCard, isPending } = useCreateCard();
 
   const toggleAssignee = (userId: string) => {
     setFormData((prev) => {
@@ -80,9 +84,18 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
       listId: listId,
       priority: formData.priority,
       assigneeIds: formData.assigneeIds,
+      description: formData.description,
     };
 
-    console.log(payload);
+    createCard(payload, {
+      onSuccess: () => {
+        toast.success("Card created");
+        onOpenChange(false);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Creating card failed");
+      },
+    });
   };
 
   useEffect(() => {
@@ -90,7 +103,7 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
       <DialogContent className="sm:max-w-[625px] max-h-[90vh] flex flex-col p-0">
         {/* Fixed Header */}
         <DialogHeader className="px-6 pt-6 pb-4">
@@ -212,7 +225,12 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
             {/* Description */}
             <div className="grid gap-3">
               <Label htmlFor="description">Description</Label>
-              <SimpleEditor />
+              <SimpleEditor
+                content={formData.description}
+                onChange={(content) =>
+                  setFormData((p) => ({ ...p, description: content }))
+                }
+              />
             </div>
           </div>
         </div>
@@ -220,10 +238,17 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
         {/* Fixed Footer */}
         <DialogFooter className="px-6 py-4 border-t">
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button disabled={isPending} variant="outline">
+              Cancel
+            </Button>
           </DialogClose>
-          <Button onClick={handleSubmit} type="button" form="add-card-form">
-            Add Card
+          <Button
+            disabled={isPending}
+            onClick={handleSubmit}
+            type="button"
+            form="add-card-form"
+          >
+            {isPending ? "Adding Card..." : "Add Card"}
           </Button>
         </DialogFooter>
       </DialogContent>

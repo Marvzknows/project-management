@@ -187,7 +187,17 @@ const MobileToolbarContent = ({
   </>
 );
 
-export function SimpleEditor() {
+type SimpleEditorProps = {
+  content: string;
+  onChange: (value: string) => void;
+  isLoading?: boolean;
+};
+
+export function SimpleEditor({
+  content,
+  onChange,
+  isLoading,
+}: SimpleEditorProps) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
@@ -232,7 +242,14 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content: "",
+    content: content || "",
+    // onUpdate: ({ editor }) => {
+    //   // Call onChange whenever content changes
+    //   onChange?.(editor.getHTML());
+    // },
+    onUpdate: ({ editor }) => {
+      onChange?.(JSON.stringify(editor.getJSON()));
+    },
   });
 
   const rect = useCursorVisibility({
@@ -277,6 +294,7 @@ export function SimpleEditor() {
           editor={editor}
           role="presentation"
           className="simple-editor-content"
+          disabled={isLoading}
         />
       </EditorContext.Provider>
     </div>
