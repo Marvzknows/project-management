@@ -97,10 +97,10 @@ const BoardPage = () => {
   const refetchTimeoutRef = useRef<NodeJS.Timeout>(null);
 
   useEffect(() => {
-    if (!user?.activeBoardId) return;
+    if (!user?.activeBoardId || lists.length === 0) return;
 
-    const channel = supabase
-      .channel(`board-${user.activeBoardId}`)
+    const listChannel = supabase
+      .channel(`board-list-${user.activeBoardId}`)
       .on(
         "postgres_changes",
         {
@@ -109,10 +109,7 @@ const BoardPage = () => {
           table: "List",
           filter: `boardId=eq.${user.activeBoardId}`,
         },
-        async (payload) => {
-          console.log("Event received:", payload);
-
-          // Clear existing timeout
+        async (_payload) => {
           if (refetchTimeoutRef.current) {
             clearTimeout(refetchTimeoutRef.current);
           }
@@ -125,13 +122,38 @@ const BoardPage = () => {
       )
       .subscribe();
 
+    // Subscribe to Card changes for each list
+    const cardChannels = lists.map((list) =>
+      supabase
+        .channel(`card-${list.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "Card",
+            filter: `listId=eq.${list.id}`,
+          },
+          async (_payload) => {
+            if (refetchTimeoutRef.current) {
+              clearTimeout(refetchTimeoutRef.current);
+            }
+            refetchTimeoutRef.current = setTimeout(async () => {
+              await refetchBoard();
+            }, 300);
+          }
+        )
+        .subscribe()
+    );
+
     return () => {
       if (refetchTimeoutRef.current) {
         clearTimeout(refetchTimeoutRef.current);
       }
-      channel.unsubscribe();
+      listChannel.unsubscribe();
+      cardChannels.forEach((channel) => channel.unsubscribe());
     };
-  }, [user?.activeBoardId]);
+  }, [user?.activeBoardId, refetchBoard, lists]);
 
   return (
     <div className="p-4 h-full flex flex-col">
