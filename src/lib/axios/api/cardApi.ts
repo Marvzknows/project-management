@@ -5,7 +5,7 @@ export type CardFormDataT = {
   title: string;
   listId: string;
   priority: string;
-  assigneeIds: string[];
+  assignees: string[];
   description: string;
 };
 

@@ -91,7 +91,7 @@ const BoardList = ({ list, dragHandleListeners }: Props) => {
           No task found
         </p>
       ) : (
-        list.cards.map((a) => <TaskCard key={a.id} priority={a.priority} />)
+        list.cards.map((card) => <TaskCard key={card.id} props={card} />)
       )}
 
       <AddCardDialog

@@ -56,7 +56,7 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
     title: "",
     listId: "",
     priority: "",
-    assigneeIds: [],
+    assignees: [],
     description: "",
   };
   const [formData, setFormData] = useState<CardFormDataT>(initialFormData);
@@ -65,11 +65,11 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
 
   const toggleAssignee = (userId: string) => {
     setFormData((prev) => {
-      const exists = prev.assigneeIds.includes(userId);
+      const exists = prev.assignees.includes(userId);
       const updated = exists
-        ? prev.assigneeIds.filter((id) => id !== userId)
-        : [...prev.assigneeIds, userId];
-      return { ...prev, assigneeIds: updated };
+        ? prev.assignees.filter((id) => id !== userId)
+        : [...prev.assignees, userId];
+      return { ...prev, assignees: updated };
     });
   };
 
@@ -83,7 +83,7 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
       title: formData.title,
       listId: listId,
       priority: formData.priority,
-      assigneeIds: formData.assigneeIds,
+      assignees: formData.assignees,
       description: formData.description,
     };
 
@@ -140,13 +140,12 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
                     role="combobox"
                     className={cn(
                       "w-full justify-between",
-                      formData.assigneeIds.length === 0 &&
-                        "text-muted-foreground"
+                      formData.assignees.length === 0 && "text-muted-foreground"
                     )}
                     disabled={isLoading}
                   >
-                    {formData.assigneeIds.length > 0
-                      ? `${formData.assigneeIds.length} selected`
+                    {formData.assignees.length > 0
+                      ? `${formData.assignees.length} selected`
                       : "Select users..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
                   </Button>
@@ -167,7 +166,7 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                formData.assigneeIds.includes(user.id)
+                                formData.assignees.includes(user.id)
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
@@ -180,9 +179,9 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
                   </Command>
                 </PopoverContent>
               </Popover>
-              {formData.assigneeIds.length > 0 && (
+              {formData.assignees.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-1">
-                  {formData.assigneeIds.map((id) => {
+                  {formData.assignees.map((id) => {
                     const user = data?.data.find((u) => u.id === id);
                     return (
                       <span

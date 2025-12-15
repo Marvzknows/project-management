@@ -2,11 +2,25 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PriorityBadge, { Priority } from "./PriorityBadge";
 import { MessageCircleMore, Users } from "lucide-react";
+import { CardT } from "@/types/card";
 
 type Props = {
-  priority: Priority;
+  props: CardT;
 };
-const TaskCard = ({ priority }: Props) => {
+const TaskCard = ({ props }: Props) => {
+  const {
+    title,
+    // description,
+    // createdAt,
+    // updatedAt,
+    // listId,
+    // position,
+    // createdById,
+    priority,
+    assignees,
+    commentsCount,
+  } = props;
+  console.log(props);
   return (
     <Card className="shadow-none rounded-lg">
       <CardHeader>
@@ -17,19 +31,19 @@ const TaskCard = ({ priority }: Props) => {
             <AvatarFallback className="text-[10px]">CN</AvatarFallback>
           </Avatar>
         </div>
-        <CardTitle className="text-sm">Task title</CardTitle>
+        <CardTitle className="text-sm">{title}</CardTitle>
       </CardHeader>
       <CardContent className="text-xs text-muted-foreground">
         <div className="flex justify-between items-center">
-          <PriorityBadge priority={priority} />
+          <PriorityBadge priority={priority as Priority} />
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 hover:text-slate-600 cursor-pointer">
               <MessageCircleMore className="w-4 h-4" />
-              <span>3</span>
+              <span>{commentsCount}</span>
             </div>
             <div className="flex items-center gap-1 hover:text-slate-600 cursor-pointer">
               <Users className="w-4 h-4" />
-              <span>3</span>
+              <span>{assignees.length || 0}</span>
             </div>
           </div>
         </div>
