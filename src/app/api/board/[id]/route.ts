@@ -41,7 +41,41 @@ export const GET = async (
             position: true,
             boardId: true,
             createdById: true,
-            cards: true,
+            cards: {
+              orderBy: { position: "desc" },
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                createdAt: true,
+                updatedAt: true,
+                listId: true,
+                position: true,
+                createdById: true,
+                createdBy: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
+                priority: true,
+                _count: {
+                  select: {
+                    comments: true,
+                  },
+                },
+                assignees: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
+              },
+            },
           },
         },
         activeUsers: {
@@ -66,8 +100,20 @@ export const GET = async (
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const formattedBoard = {
+      ...board,
+      List: board.List.map((list) => ({
+        ...list,
+        cards: list.cards.map((card) => ({
+          ...card,
+          commentsCount: card._count.comments,
+          _count: undefined, // optional cleanup
+        })),
+      })),
+    };
+
     return NextResponse.json({
-      data: board,
+      data: formattedBoard,
     });
   } catch (error) {
     return NextResponse.json(

@@ -57,3 +57,14 @@ export type AddMemberPayloadT = {
   boardId: string;
   email: string;
 };
+
+export type BoardMembersT = {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+};
+
+export type BoardMembersListT = {
+  data: BoardMembersT[];
+};

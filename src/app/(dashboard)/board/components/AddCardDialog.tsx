@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,198 +27,229 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
+import { useBoardMembersList } from "@/hooks/boardHooks";
+import { AuthContext } from "@/context/auth/AuthContext";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CardFormDataT } from "@/lib/axios/api/cardApi";
+import { useCreateCard } from "@/hooks/cardHooks";
+import { toast } from "sonner";
 
 type AddCardDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   listId: string;
-  users: { id: string; name: string }[];
 };
 
-const AddCardDialog = ({
-  open,
-  onOpenChange,
-  listId,
-  users,
-}: AddCardDialogProps) => {
-  const [formData, setFormData] = useState({
+const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
+  const { user } = useContext(AuthContext);
+  const { data, isLoading } = useBoardMembersList(user?.activeBoardId);
+  const initialFormData: CardFormDataT = {
+    boardId: "",
     title: "",
-    description: "",
-    assigneeIds: [] as string[],
+    listId: "",
     priority: "",
-  });
-
+    assignees: [],
+    description: "",
+  };
+  const [formData, setFormData] = useState<CardFormDataT>(initialFormData);
   const [openPopover, setOpenPopover] = useState(false);
+  const { mutate: createCard, isPending } = useCreateCard();
 
   const toggleAssignee = (userId: string) => {
     setFormData((prev) => {
-      const exists = prev.assigneeIds.includes(userId);
+      const exists = prev.assignees.includes(userId);
       const updated = exists
-        ? prev.assigneeIds.filter((id) => id !== userId)
-        : [...prev.assigneeIds, userId];
-      return { ...prev, assigneeIds: updated };
+        ? prev.assignees.filter((id) => id !== userId)
+        : [...prev.assignees, userId];
+      return { ...prev, assignees: updated };
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    alert(
-      JSON.stringify({
-        title: formData.title,
-        description: formData.description,
-        listId,
-        assigneeIds: formData.assigneeIds,
-        priority: formData.priority,
-      })
-    );
+    if (!user?.activeBoardId) return;
 
-    console.log({
+    const payload: CardFormDataT = {
+      boardId: user.activeBoardId,
       title: formData.title,
-      description: formData.description,
-      listId,
-      assigneeIds: formData.assigneeIds,
+      listId: listId,
       priority: formData.priority,
+      assignees: formData.assignees,
+      description: formData.description,
+    };
+
+    createCard(payload, {
+      onSuccess: () => {
+        toast.success("Card created");
+        onOpenChange(false);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Creating card failed");
+      },
     });
   };
 
   useEffect(() => {
-    setFormData({
-      title: "",
-      description: "",
-      assigneeIds: [] as string[],
-      priority: "",
-    });
+    setFormData(initialFormData);
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
+      <DialogContent className="sm:max-w-[625px] max-h-[90vh] flex flex-col p-0">
+        {/* Fixed Header */}
+        <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle>Add New Card</DialogTitle>
           <DialogDescription>
             Fill in the details below to create a new card.
           </DialogDescription>
         </DialogHeader>
 
-        <form className="grid gap-4" onSubmit={handleSubmit}>
-          {/* Title */}
-          <div className="grid gap-3">
-            <Label htmlFor="title">Card Title</Label>
-            <Input
-              id="title"
-              name="title"
-              placeholder="Enter card title"
-              value={formData.title}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, title: e.target.value }))
-              }
-            />
-          </div>
+        {/* Scrollable Content */}
+        <div className="overflow-y-auto flex-1 px-6">
+          <div id="add-card-form" className="grid gap-4 pb-4">
+            {/* Title */}
+            <div className="grid gap-3">
+              <Label htmlFor="title">Card Title</Label>
+              <Input
+                id="title"
+                name="title"
+                placeholder="Enter card title"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData((p) => ({ ...p, title: e.target.value }))
+                }
+              />
+            </div>
 
-          {/* Description */}
-          <div className="grid gap-3">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Optional description"
-              className="min-h-24"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, description: e.target.value }))
-              }
-            />
-          </div>
-
-          {/* Assignees (multi-select combobox) */}
-          <div className="grid gap-3">
-            <Label>Assignees</Label>
-            <Popover open={openPopover} onOpenChange={setOpenPopover}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    "w-full justify-between",
-                    formData.assigneeIds.length === 0 && "text-muted-foreground"
-                  )}
-                >
-                  {formData.assigneeIds.length > 0
-                    ? `${formData.assigneeIds.length} selected`
-                    : "Select users..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[300px] p-0">
-                <Command>
-                  <CommandInput placeholder="Search users..." />
-                  <CommandEmpty>No user found.</CommandEmpty>
-                  <CommandGroup>
-                    {users.map((user) => (
-                      <CommandItem
-                        key={user.id}
-                        onSelect={() => toggleAssignee(user.id)}
+            {/* Assignees (multi-select combobox) */}
+            <div className="grid gap-3">
+              <Label>Assignees</Label>
+              <Popover open={openPopover} onOpenChange={setOpenPopover}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-full justify-between",
+                      formData.assignees.length === 0 && "text-muted-foreground"
+                    )}
+                    disabled={isLoading}
+                  >
+                    {formData.assignees.length > 0
+                      ? `${formData.assignees.length} selected`
+                      : "Select users..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search users..." />
+                    <CommandEmpty>No user found.</CommandEmpty>
+                    <CommandGroup>
+                      {data?.data.length === 0 ? (
+                        <CommandEmpty>No board member.</CommandEmpty>
+                      ) : (
+                        data?.data?.map((user) => (
+                          <CommandItem
+                            key={user.id}
+                            onSelect={() => toggleAssignee(user.id)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.assignees.includes(user.id)
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {user.name}
+                          </CommandItem>
+                        ))
+                      )}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              {formData.assignees.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {formData.assignees.map((id) => {
+                    const user = data?.data.find((u) => u.id === id);
+                    return (
+                      <span
+                        key={id}
+                        className="px-2 py-0.5 bg-secondary text-sm rounded-md"
                       >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            formData.assigneeIds.includes(user.id)
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        {user.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            {formData.assigneeIds.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {formData.assigneeIds.map((id) => {
-                  const user = users.find((u) => u.id === id);
-                  return (
-                    <span
-                      key={id}
-                      className="px-2 py-0.5 bg-secondary text-sm rounded-md"
-                    >
-                      {user?.name}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                        {user?.name}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-          {/* Priority */}
-          <div className="grid gap-3">
-            <Label htmlFor="priority">Priority</Label>
-            <select
-              id="priority"
-              value={formData.priority}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, priority: e.target.value }))
-              }
-              className="border rounded-md px-3 py-2"
-            >
-              <option value="">Select priority</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-              <option value="URGENT">Urgent</option>
-            </select>
-          </div>
+            {/* Priority */}
+            <div className="grid gap-3">
+              <Label htmlFor="priority">Priority</Label>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button type="submit">Add Card</Button>
-          </DialogFooter>
-        </form>
+              <Select
+                value={formData.priority}
+                onValueChange={(value) =>
+                  setFormData((p) => ({ ...p, priority: value }))
+                }
+              >
+                <SelectTrigger id="priority" className="w-[180px]">
+                  <SelectValue placeholder="Select priority" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="LOW">Low</SelectItem>
+                    <SelectItem value="MEDIUM">Medium</SelectItem>
+                    <SelectItem value="HIGH">High</SelectItem>
+                    <SelectItem value="URGENT">Urgent</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Description */}
+            <div className="grid gap-3">
+              <Label htmlFor="description">Description</Label>
+              <SimpleEditor
+                content={formData.description}
+                onChange={(content) =>
+                  setFormData((p) => ({ ...p, description: content }))
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Fixed Footer */}
+        <DialogFooter className="px-6 py-4 border-t">
+          <DialogClose asChild>
+            <Button disabled={isPending} variant="outline">
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button
+            disabled={isPending}
+            onClick={handleSubmit}
+            type="button"
+            form="add-card-form"
+          >
+            {isPending ? "Adding Card..." : "Add Card"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

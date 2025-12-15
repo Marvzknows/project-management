@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { CirclePlus, MoreHorizontalIcon, Pencil, Trash } from "lucide-react";
+import { useContext, useState } from "react";
+import {
+  CirclePlus,
+  GripVertical,
+  MoreHorizontalIcon,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,23 +20,33 @@ import AddCardDialog from "./AddCardDialog";
 import { ListT } from "@/types/list";
 import EditListTitleDialog from "./EditListTitleDialog";
 import DeleteListDialog from "./DeleteListDialog";
+import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import { AuthContext } from "@/context/auth/AuthContext";
 
 type Props = {
   list: ListT;
+  dragHandleListeners?: SyntheticListenerMap;
 };
-const BoardList = ({ list }: Props) => {
+
+const BoardList = ({ list, dragHandleListeners }: Props) => {
+  const { user } = useContext(AuthContext);
   const [openAddCard, setOpenAddCard] = useState(false);
   const [openEditListTitle, setOpenEditListTitle] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const membersOptions = [
-    { id: "1", name: "Marvin Lim" },
-    { id: "2", name: "John Doe" },
-  ];
 
   return (
     <div className="min-w-[380px] max-w-[380px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
       <div className="flex items-center justify-between sticky top-0 bg-secondary z-10 pb-2">
-        <h2 className="text-lg">{list.title}</h2>
+        {/* Drag Handle */}
+        <div className="flex items-center gap-2">
+          <div
+            {...dragHandleListeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded"
+          >
+            <GripVertical className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <h2 className="text-lg">{list.title}</h2>
+        </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -77,18 +93,19 @@ const BoardList = ({ list }: Props) => {
           No task found
         </p>
       ) : (
-        <TaskCard priority={"NONE"} />
+        list.cards.map((card) => (
+          <TaskCard
+            key={card.id}
+            props={card}
+            projectTitle={user?.activeBoard?.title ?? "N/A"}
+          />
+        ))
       )}
-      {/* <TaskCard priority={"LOW"} />
-      <TaskCard priority={"HIGH"} />
-      <TaskCard priority={"URGENT"} />
-      <TaskCard priority={"VERY HIGH"} /> */}
 
       <AddCardDialog
         open={openAddCard}
         onOpenChange={setOpenAddCard}
         listId={list.id}
-        users={membersOptions}
       />
 
       <EditListTitleDialog

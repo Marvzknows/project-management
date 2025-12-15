@@ -1,4 +1,4 @@
-import { Card } from "@/generated/prisma";
+import { CardT } from "./card";
 
 export type CreateListT = {
   boardId: string;
@@ -13,7 +13,7 @@ export type ListT = {
   position: string;
   boardId: string;
   createdById: string;
-  cards: Card[]; // temporary
+  cards: CardT[];
 };
 
 export type UpdateListPositionT = {

@@ -16,8 +16,8 @@ export default function SortableBoardList({ list }: { list: ListT }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <BoardList list={list} />
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <BoardList list={list} dragHandleListeners={listeners} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import {
   AddMemberPayloadT,
   BoardIsAllT,
+  BoardMembersListT,
   UseBoardParamsT,
   UserBoardDataT,
 } from "@/types/board";
@@ -24,4 +25,8 @@ export const createBoardApi = async (boardName: string) => {
 
 export const addBoardMemberApi = async (payload: AddMemberPayloadT) => {
   return await apiClient.post(`/board/add-member`, payload);
+};
+
+export const getBoardMembersApi = async (boardId: string) => {
+  return await apiClient.get<BoardMembersListT>(`/board/member/${boardId}`);
 };

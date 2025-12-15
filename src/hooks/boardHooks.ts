@@ -3,6 +3,7 @@ import {
   createBoardApi,
   getBoardApi,
   getBoardListApi,
+  getBoardMembersApi,
   updateUserActiveBoardApi,
 } from "@/lib/axios/api/boardApi";
 import { AddMemberPayloadT, UseBoardParamsT } from "@/types/board";
@@ -52,5 +53,15 @@ export const useAddBoardMember = () => {
       return await addBoardMemberApi(payload);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
+  });
+};
+
+export const useBoardMembersList = (boardId: string | undefined | null) => {
+  return useQuery({
+    queryKey: ["boardMembersList", boardId],
+    queryFn: async () => {
+      return await getBoardMembersApi(boardId!);
+    },
+    enabled: !!boardId,
   });
 };
