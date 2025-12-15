@@ -42,6 +42,7 @@ export const GET = async (
             boardId: true,
             createdById: true,
             cards: {
+              orderBy: { position: "desc" },
               select: {
                 id: true,
                 title: true,
