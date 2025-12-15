@@ -51,6 +51,14 @@ export const GET = async (
                 listId: true,
                 position: true,
                 createdById: true,
+                createdBy: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
+                },
                 priority: true,
                 _count: {
                   select: {

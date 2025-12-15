@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   CirclePlus,
   GripVertical,
@@ -21,6 +21,7 @@ import { ListT } from "@/types/list";
 import EditListTitleDialog from "./EditListTitleDialog";
 import DeleteListDialog from "./DeleteListDialog";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
+import { AuthContext } from "@/context/auth/AuthContext";
 
 type Props = {
   list: ListT;
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const BoardList = ({ list, dragHandleListeners }: Props) => {
+  const { user } = useContext(AuthContext);
   const [openAddCard, setOpenAddCard] = useState(false);
   const [openEditListTitle, setOpenEditListTitle] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -91,7 +93,13 @@ const BoardList = ({ list, dragHandleListeners }: Props) => {
           No task found
         </p>
       ) : (
-        list.cards.map((card) => <TaskCard key={card.id} props={card} />)
+        list.cards.map((card) => (
+          <TaskCard
+            key={card.id}
+            props={card}
+            projectTitle={user?.activeBoard?.title ?? "N/A"}
+          />
+        ))
       )}
 
       <AddCardDialog

@@ -7,6 +7,12 @@ export type CardT = {
   listId: string;
   position: number;
   createdById: string;
+  createdBy: {
+    id: string;
+    name: string;
+    email: string;
+    image: string;
+  };
   priority: string;
   assignees: {
     id: string;

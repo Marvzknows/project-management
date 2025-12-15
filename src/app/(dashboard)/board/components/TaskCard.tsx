@@ -1,55 +1,60 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PriorityBadge, { Priority } from "./PriorityBadge";
 import { MessageCircleMore, Users } from "lucide-react";
 import { CardT } from "@/types/card";
+import { motion } from "framer-motion";
 
 type Props = {
   props: CardT;
-};
-const TaskCard = ({ props }: Props) => {
-  const {
-    title,
-    // description,
-    // createdAt,
-    // updatedAt,
-    // listId,
-    // position,
-    // createdById,
-    priority,
-    assignees,
-    commentsCount,
-  } = props;
-  console.log(props);
-  return (
-    <Card className="shadow-none rounded-lg">
-      <CardHeader>
-        <div className="flex justify-between items-center border-b pb-2">
-          <p className="text-xs text-muted-foreground">Project title</p>
-          <Avatar className="w-5 h-5 rounded-full">
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback className="text-[10px]">CN</AvatarFallback>
-          </Avatar>
-        </div>
-        <CardTitle className="text-sm">{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="text-xs text-muted-foreground">
-        <div className="flex justify-between items-center">
-          <PriorityBadge priority={priority as Priority} />
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 hover:text-slate-600 cursor-pointer">
-              <MessageCircleMore className="w-4 h-4" />
-              <span>{commentsCount}</span>
-            </div>
-            <div className="flex items-center gap-1 hover:text-slate-600 cursor-pointer">
-              <Users className="w-4 h-4" />
-              <span>{assignees.length || 0}</span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  projectTitle: string;
 };
 
-export default TaskCard;
+export default function TaskCard({ props, projectTitle }: Props) {
+  const { title, priority, assignees, commentsCount, createdBy } = props;
+
+  return (
+    <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.15 }}>
+      <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+        <CardContent className="p-4 space-y-3">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="space-y-1">
+              <p className="text-[11px] text-muted-foreground truncate">
+                {projectTitle}
+              </p>
+              <h3 className="text-sm font-medium leading-tight line-clamp-2">
+                {title}
+              </h3>
+            </div>
+
+            <Avatar className="h-6 w-6">
+              <AvatarImage
+                src={createdBy.image ?? "https://github.com/shadcn.png"}
+              />
+              <AvatarFallback className="text-[10px]">
+                {createdBy.name?.[0]}
+              </AvatarFallback>
+            </Avatar>
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between">
+            <PriorityBadge priority={priority as Priority} />
+
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <MessageCircleMore className="h-4 w-4" />
+                <span>{commentsCount}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span>{assignees.length}</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
