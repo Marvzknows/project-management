@@ -17,7 +17,6 @@ export const useCreateCard = () => {
 };
 
 export const useUpdateCardPosition = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({
       payload,
@@ -28,6 +27,5 @@ export const useUpdateCardPosition = () => {
     }) => {
       return await updateCardPosition(payload, cardId);
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
   });
 };

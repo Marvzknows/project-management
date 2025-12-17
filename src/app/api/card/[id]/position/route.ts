@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 
-// Update card position
+// Update card position and/or list
 export const PATCH = async (
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -18,7 +18,11 @@ export const PATCH = async (
     }
 
     const { id: cardId } = params;
-    const { boardId, listId, position: newPosition } = await req.json();
+    const {
+      boardId,
+      listId: newListId,
+      position: newPosition,
+    } = await req.json();
 
     // Validate new position
     if (typeof newPosition !== "number" || newPosition < 0) {
@@ -46,11 +50,10 @@ export const PATCH = async (
       );
     }
 
-    // Check card belongs to the list & board
+    // Get the card and verify it belongs to this board
     const card = await prisma.card.findFirst({
       where: {
         id: cardId,
-        listId,
         List: {
           boardId,
         },
@@ -64,14 +67,33 @@ export const PATCH = async (
 
     if (!card) {
       return NextResponse.json(
-        { error: "Invalid card or list" },
+        { error: "Card not found or doesn't belong to this board" },
+        { status: 404 }
+      );
+    }
+
+    // Verify the new list belongs to this board
+    const newList = await prisma.list.findFirst({
+      where: {
+        id: newListId,
+        boardId,
+      },
+      select: { id: true },
+    });
+
+    if (!newList) {
+      return NextResponse.json(
+        { error: "Target list not found or doesn't belong to this board" },
         { status: 404 }
       );
     }
 
     const oldPosition = card.position;
+    const oldListId = card.listId;
+    const isMovingToNewList = oldListId !== newListId;
 
-    if (oldPosition === newPosition) {
+    // If nothing changed, return early
+    if (!isMovingToNewList && oldPosition === newPosition) {
       return NextResponse.json(
         { message: "Card position unchanged" },
         { status: 200 }
@@ -79,14 +101,15 @@ export const PATCH = async (
     }
 
     await prisma.$transaction(async (tx) => {
-      if (newPosition > oldPosition) {
-        // Moving down: shift cards between old and new position up
+      if (isMovingToNewList) {
+        // SCENARIO 1: Moving to a different list
+
+        // 1. Close the gap in the old list
         await tx.card.updateMany({
           where: {
-            listId: listId,
+            listId: oldListId,
             position: {
               gt: oldPosition,
-              lte: newPosition,
             },
           },
           data: {
@@ -95,14 +118,13 @@ export const PATCH = async (
             },
           },
         });
-      } else {
-        // Moving up: shift cards between new and old position down
+
+        // 2. Make space in the new list
         await tx.card.updateMany({
           where: {
-            listId,
+            listId: newListId,
             position: {
               gte: newPosition,
-              lt: oldPosition,
             },
           },
           data: {
@@ -111,17 +133,66 @@ export const PATCH = async (
             },
           },
         });
-      }
 
-      // Update the target card to its new position
-      await tx.card.update({
-        where: { id: cardId },
-        data: { position: newPosition },
-      });
+        // 3. Move the card to the new list and position
+        await tx.card.update({
+          where: { id: cardId },
+          data: {
+            listId: newListId,
+            position: newPosition,
+          },
+        });
+      } else {
+        // SCENARIO 2: Reordering within the same list
+
+        if (newPosition > oldPosition) {
+          // Moving down: shift cards between old and new position up
+          await tx.card.updateMany({
+            where: {
+              listId: newListId,
+              position: {
+                gt: oldPosition,
+                lte: newPosition,
+              },
+            },
+            data: {
+              position: {
+                decrement: 1,
+              },
+            },
+          });
+        } else {
+          // Moving up: shift cards between new and old position down
+          await tx.card.updateMany({
+            where: {
+              listId: newListId,
+              position: {
+                gte: newPosition,
+                lt: oldPosition,
+              },
+            },
+            data: {
+              position: {
+                increment: 1,
+              },
+            },
+          });
+        }
+
+        // Update the card to its new position
+        await tx.card.update({
+          where: { id: cardId },
+          data: { position: newPosition },
+        });
+      }
     });
 
     return NextResponse.json(
-      { message: "Card reordered successfully" },
+      {
+        message: isMovingToNewList
+          ? "Card moved to new list successfully"
+          : "Card reordered successfully",
+      },
       { status: 200 }
     );
   } catch (error) {
