@@ -13,11 +13,14 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { AuthContext } from "@/context/auth/AuthContext";
 import {
   DndContext,
-  closestCenter,
+  closestCorners,
   PointerSensor,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -25,15 +28,19 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { ListT } from "@/types/list";
+import { CardT } from "@/types/card";
 import SortableBoardList from "./components/dnd/SortableBoardList";
 import { useUpdateListPosition } from "@/hooks/listHooks";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/supabaseClient";
+import TaskCard from "./components/TaskCard";
 
 const BoardPage = () => {
   const { user } = useContext(AuthContext);
   const [searchBoard, setSearchBoard] = useState("");
   const debouncedSearch = useDebounce(searchBoard, 500);
+  const [activeCard, setActiveCard] = useState<CardT | null>(null);
+  const [activeList, setActiveList] = useState<ListT | null>(null);
 
   // #region API
   const {
@@ -50,6 +57,7 @@ const BoardPage = () => {
   } = useBoard(user?.activeBoardId);
 
   const { mutate: updateBoardListOrderMutation } = useUpdateListPosition();
+  // const { mutate: updateCardPositionMutation } = useUpdateCardPosition();
   // #endregion
   const boardOptions = useMemo(() => {
     return (
@@ -76,25 +84,171 @@ const BoardPage = () => {
     })
   );
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+
+    // Check if dragging a list
+    const list = lists.find((l) => l.id === active.id);
+    if (list) {
+      setActiveList(list);
+      return;
+    }
+
+    // Check if dragging a card
+    const sourceList = lists.find((list) =>
+      list.cards.some((card) => card.id === active.id)
+    );
+
+    if (sourceList) {
+      const card = sourceList.cards.find((card) => card.id === active.id);
+      setActiveCard(card || null);
+    }
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id;
+    const overId = over.id;
+
+    // If dragging a list, don't handle card logic
+    if (activeList) return;
+
+    if (activeId === overId) return;
+
+    // Determine if we're dragging a card
+    const sourceList = lists.find((list) =>
+      list.cards.some((card) => card.id === activeId)
+    );
+
+    if (!sourceList) return; // Not dragging a card
+
+    // Find the list that contains the over item (could be a card or list drop zone)
+    let targetList = lists.find((list) =>
+      list.cards.some((card) => card.id === overId)
+    );
+
+    // If over item is not a card, check if it's a list drop zone
+    if (!targetList) {
+      const listId = String(overId).replace("list-", "");
+      targetList = lists.find((list) => String(list.id) === listId);
+    }
+
+    if (!targetList) return;
+
+    const activeListIndex = lists.findIndex(
+      (list) => list.id === sourceList.id
+    );
+    const overListIndex = lists.findIndex((list) => list.id === targetList.id);
+
+    if (activeListIndex === overListIndex) {
+      // Moving within the same list
+      const oldIndex = sourceList.cards.findIndex(
+        (card) => card.id === activeId
+      );
+      const overCard = targetList.cards.find((card) => card.id === overId);
+      const newIndex = overCard
+        ? targetList.cards.findIndex((card) => card.id === overId)
+        : targetList.cards.length;
+
+      if (oldIndex !== newIndex) {
+        const newCards = arrayMove(sourceList.cards, oldIndex, newIndex);
+        const newLists = [...lists];
+        newLists[activeListIndex] = { ...sourceList, cards: newCards };
+        setLists(newLists);
+      }
+    } else {
+      // Moving to a different list
+      const movedCard = sourceList.cards.find((card) => card.id === activeId);
+      if (!movedCard) return;
+
+      const newActiveCards = sourceList.cards.filter(
+        (card) => card.id !== activeId
+      );
+
+      const overCard = targetList.cards.find((card) => card.id === overId);
+      const insertIndex = overCard
+        ? targetList.cards.findIndex((card) => card.id === overId)
+        : targetList.cards.length;
+
+      const newOverCards = [...targetList.cards];
+      newOverCards.splice(insertIndex, 0, movedCard);
+
+      const newLists = [...lists];
+      newLists[activeListIndex] = { ...sourceList, cards: newActiveCards };
+      newLists[overListIndex] = { ...targetList, cards: newOverCards };
+      setLists(newLists);
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over || active.id === over.id) return;
+    setActiveCard(null);
+    setActiveList(null);
 
-    const oldIndex = lists.findIndex((l) => l.id === active.id);
-    const newIndex = lists.findIndex((l) => l.id === over.id);
+    if (!over) return;
 
-    const newOrder = arrayMove(lists, oldIndex, newIndex);
-    setLists(newOrder);
+    // Handle list reordering
+    if (activeList) {
+      const oldIndex = lists.findIndex((l) => l.id === active.id);
+      const newIndex = lists.findIndex((l) => l.id === over.id);
 
-    //update order in database
-    updateBoardListOrderMutation(
-      { listId: String(active.id), position: newIndex + 1 },
-      { onError: () => toast.error("Updating list position failed") }
+      if (oldIndex !== newIndex) {
+        const newOrder = arrayMove(lists, oldIndex, newIndex);
+        setLists(newOrder);
+
+        updateBoardListOrderMutation(
+          { listId: String(active.id), position: newIndex + 1 },
+          { onError: () => toast.error("Updating list position failed") }
+        );
+      }
+      return;
+    }
+
+    // Handle card drop
+    const sourceList = lists.find((list) =>
+      list.cards.some((card) => card.id === active.id)
     );
+
+    if (!sourceList) return;
+
+    let targetList = lists.find((list) =>
+      list.cards.some((card) => card.id === over.id)
+    );
+
+    if (!targetList) {
+      const listId = String(over.id).replace("list-", "");
+      targetList = lists.find((list) => String(list.id) === listId);
+    }
+
+    if (!targetList) return;
+
+    const card = sourceList.cards.find((card) => card.id === active.id);
+    if (!card) return;
+
+    const targetCardIndex = targetList.cards.findIndex((c) => c.id === card.id);
+    const newPosition = targetCardIndex + 1;
+
+    // TODO: Call your API to update the card position
+    // updateCardPositionMutation({
+    //   cardId: String(card.id),
+    //   listId: String(targetList.id),
+    //   position: newPosition,
+    // }, {
+    //   onError: () => toast.error("Updating card position failed")
+    // });
+
+    console.log("Card moved:", {
+      cardId: card.id,
+      fromList: sourceList.id,
+      toList: targetList.id,
+      newPosition,
+    });
   };
 
-  const refetchTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const refetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!user?.activeBoardId || lists.length === 0) return;
@@ -114,7 +268,6 @@ const BoardPage = () => {
             clearTimeout(refetchTimeoutRef.current);
           }
 
-          // Set new timeout - only refetch after 300ms of no more events
           refetchTimeoutRef.current = setTimeout(async () => {
             await refetchBoard();
           }, 300);
@@ -122,7 +275,6 @@ const BoardPage = () => {
       )
       .subscribe();
 
-    // Subscribe to Card changes for each list
     const cardChannels = lists.map((list) =>
       supabase
         .channel(`card-${list.id}`)
@@ -186,7 +338,9 @@ const BoardPage = () => {
         <div className="flex-1 min-h-0">
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCenter}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
             <SortableContext
@@ -201,6 +355,15 @@ const BoardPage = () => {
                 <AddBoardListDialog boardId={user.activeBoardId} />
               </div>
             </SortableContext>
+
+            <DragOverlay>
+              {activeCard ? (
+                <TaskCard
+                  props={activeCard}
+                  projectTitle={user?.activeBoard?.title ?? "N/A"}
+                />
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </div>
       )}

@@ -15,13 +15,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import TaskCard from "./TaskCard";
 import AddCardDialog from "./AddCardDialog";
 import { ListT } from "@/types/list";
 import EditListTitleDialog from "./EditListTitleDialog";
 import DeleteListDialog from "./DeleteListDialog";
 import { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { AuthContext } from "@/context/auth/AuthContext";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
+import SortableTaskCard from "./dnd/SortableTaskCard";
 
 type Props = {
   list: ListT;
@@ -33,6 +38,10 @@ const BoardList = ({ list, dragHandleListeners }: Props) => {
   const [openAddCard, setOpenAddCard] = useState(false);
   const [openEditListTitle, setOpenEditListTitle] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+
+  const { setNodeRef } = useDroppable({
+    id: `list-${list.id}`,
+  });
 
   return (
     <div className="min-w-[380px] max-w-[380px] h-full flex-shrink-0 flex flex-col gap-2 p-2.5 rounded shadow border bg-secondary overflow-y-auto">
@@ -87,20 +96,27 @@ const BoardList = ({ list, dragHandleListeners }: Props) => {
         </DropdownMenu>
       </div>
 
-      {/* Example task cards */}
-      {list.cards.length === 0 ? (
-        <p className="border rounded p-2 text-xs dark:bg-black bg-slate-100">
-          No task found
-        </p>
-      ) : (
-        list.cards.map((card) => (
-          <TaskCard
-            key={card.id}
-            props={card}
-            projectTitle={user?.activeBoard?.title ?? "N/A"}
-          />
-        ))
-      )}
+      {/* Cards Container */}
+      <div ref={setNodeRef} className="flex-1 space-y-2">
+        <SortableContext
+          items={list.cards.map((c) => c.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {list.cards.length === 0 ? (
+            <p className="border rounded p-2 text-xs dark:bg-black bg-slate-100">
+              No task found
+            </p>
+          ) : (
+            list.cards.map((card) => (
+              <SortableTaskCard
+                key={card.id}
+                card={card}
+                projectTitle={user?.activeBoard?.title ?? "N/A"}
+              />
+            ))
+          )}
+        </SortableContext>
+      </div>
 
       <AddCardDialog
         open={openAddCard}
