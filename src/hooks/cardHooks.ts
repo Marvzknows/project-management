@@ -1,4 +1,9 @@
-import { CardFormDataT, createCardApi } from "@/lib/axios/api/cardApi";
+import {
+  CardFormDataT,
+  createCardApi,
+  updateCardPosition,
+  UpdateCardPositionT,
+} from "@/lib/axios/api/cardApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateCard = () => {
@@ -6,6 +11,22 @@ export const useCreateCard = () => {
   return useMutation({
     mutationFn: async (payload: CardFormDataT) => {
       return await createCardApi(payload);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
+  });
+};
+
+export const useUpdateCardPosition = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      payload,
+      cardId,
+    }: {
+      payload: UpdateCardPositionT;
+      cardId: string;
+    }) => {
+      return await updateCardPosition(payload, cardId);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
   });

@@ -34,6 +34,8 @@ import { useUpdateListPosition } from "@/hooks/listHooks";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/supabaseClient";
 import TaskCard from "./components/TaskCard";
+import { useUpdateCardPosition } from "@/hooks/cardHooks";
+import { UpdateCardPositionT } from "@/lib/axios/api/cardApi";
 
 const BoardPage = () => {
   const { user } = useContext(AuthContext);
@@ -57,7 +59,7 @@ const BoardPage = () => {
   } = useBoard(user?.activeBoardId);
 
   const { mutate: updateBoardListOrderMutation } = useUpdateListPosition();
-  // const { mutate: updateCardPositionMutation } = useUpdateCardPosition();
+  const { mutate: updateCardPositionMutation } = useUpdateCardPosition();
   // #endregion
   const boardOptions = useMemo(() => {
     return (
@@ -232,13 +234,15 @@ const BoardPage = () => {
     const newPosition = targetCardIndex + 1;
 
     // TODO: Call your API to update the card position
-    // updateCardPositionMutation({
-    //   cardId: String(card.id),
-    //   listId: String(targetList.id),
-    //   position: newPosition,
-    // }, {
-    //   onError: () => toast.error("Updating card position failed")
-    // });
+    const payload: UpdateCardPositionT = {
+      boardId: user?.activeBoardId ?? "N/A",
+      listId: String(targetList.id),
+      position: newPosition,
+    };
+    updateCardPositionMutation(
+      { payload: payload, cardId: String(card.id) },
+      { onError: () => toast.error("Updating card position failed") }
+    );
 
     console.log("Card moved:", {
       cardId: card.id,
