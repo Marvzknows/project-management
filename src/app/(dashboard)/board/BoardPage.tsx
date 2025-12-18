@@ -233,7 +233,6 @@ const BoardPage = () => {
     const targetCardIndex = targetList.cards.findIndex((c) => c.id === card.id);
     const newPosition = targetCardIndex + 1;
 
-    // TODO: Call your API to update the card position
     const payload: UpdateCardPositionT = {
       boardId: user?.activeBoardId ?? "N/A",
       listId: String(targetList.id),
