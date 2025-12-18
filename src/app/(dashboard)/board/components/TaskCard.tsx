@@ -4,6 +4,7 @@ import PriorityBadge, { Priority } from "./PriorityBadge";
 import { MessageCircleMore, Users } from "lucide-react";
 import { CardT } from "@/types/card";
 import { motion } from "framer-motion";
+import { formatDateTime } from "@/lib/utils";
 
 type Props = {
   props: CardT;
@@ -11,7 +12,8 @@ type Props = {
 };
 
 export default function TaskCard({ props, projectTitle }: Props) {
-  const { title, priority, assignees, commentsCount, createdBy } = props;
+  const { title, priority, assignees, commentsCount, createdBy, createdAt } =
+    props;
 
   return (
     <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.15 }}>
@@ -26,6 +28,9 @@ export default function TaskCard({ props, projectTitle }: Props) {
               <h3 className="text-sm font-medium leading-tight line-clamp-2">
                 {title}
               </h3>
+              <p className="text-[11px] text-muted-foreground">
+                Created {formatDateTime(createdAt)}
+              </p>
             </div>
 
             <Avatar className="h-6 w-6">
