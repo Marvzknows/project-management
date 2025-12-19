@@ -20,6 +20,11 @@ export type AddCardAssigneeT = {
   assigneeId: string;
 };
 
+export type RemoveCardAssigneeT = {
+  cardId: string;
+  assigneeId: string;
+};
+
 export const createCardApi = async (payload: CardFormDataT) => {
   return await apiClient.post(`/card`, payload);
 };
@@ -33,4 +38,10 @@ export const updateCardPosition = async (
 
 export const addCardAssigneeApi = async (payload: AddCardAssigneeT) => {
   return await apiClient.post(`/card/assignee`, payload);
+};
+
+export const removeCardAssigneeApi = async (params: RemoveCardAssigneeT) => {
+  return await apiClient.delete(
+    `/card/${params.cardId}/assignee/${params.assigneeId}`
+  );
 };

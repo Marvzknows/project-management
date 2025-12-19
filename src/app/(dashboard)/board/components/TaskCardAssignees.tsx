@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Check, ChevronsUpDown, Users, X } from "lucide-react";
 import { useContext, useState } from "react";
-import { useAddCardAssignee } from "@/hooks/cardHooks";
+import { useAddCardAssignee, useRemoveCardAssignee } from "@/hooks/cardHooks";
 import { toast } from "sonner";
 import {
   Popover,
@@ -31,6 +31,7 @@ import { cn } from "@/lib/tiptap-utils";
 import { useBoard } from "@/hooks/boardHooks";
 import { AuthContext } from "@/context/auth/AuthContext";
 import { BoardUsersT } from "@/types/board";
+import { RemoveCardAssigneeT } from "@/lib/axios/api/cardApi";
 
 type Props = {
   assignees: CardT["assignees"];
@@ -52,7 +53,10 @@ export default function TaskCardAssignees({
   );
 
   const { mutate, isPending } = useAddCardAssignee();
-  const isLoading = isLoadingBoardData || isPending;
+  const { mutate: removeActions, isPending: isRemoving } =
+    useRemoveCardAssignee();
+
+  const isLoading = isLoadingBoardData || isPending || isRemoving;
 
   const handleAddAssignee = () => {
     if (!selectedUser) return;
@@ -67,6 +71,18 @@ export default function TaskCardAssignees({
         onError: () => toast.error("Adding card assignee failed"),
       }
     );
+  };
+
+  const handleRemoveAssignee = (assigneeId: string) => {
+    const payload: RemoveCardAssigneeT = { cardId, assigneeId };
+    removeActions;
+    removeActions(payload, {
+      onSuccess: () => {
+        toast.success("Assignee removed");
+        setOpen(false);
+      },
+      onError: () => toast.error("Removing card assignee failed"),
+    });
   };
 
   return (
@@ -113,7 +129,12 @@ export default function TaskCardAssignees({
                       <p className="text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
-                  <Button size="icon" variant="ghost">
+                  <Button
+                    disabled={isLoading}
+                    onClick={() => handleRemoveAssignee(user.id)}
+                    size="icon"
+                    variant="ghost"
+                  >
                     <X className="h-4 w-4 text-muted-foreground" />
                   </Button>
                 </div>

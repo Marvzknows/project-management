@@ -3,6 +3,8 @@ import {
   AddCardAssigneeT,
   CardFormDataT,
   createCardApi,
+  removeCardAssigneeApi,
+  RemoveCardAssigneeT,
   updateCardPosition,
   UpdateCardPositionT,
 } from "@/lib/axios/api/cardApi";
@@ -36,6 +38,14 @@ export const useAddCardAssignee = () => {
   return useMutation({
     mutationFn: async (payload: AddCardAssigneeT) => {
       return await addCardAssigneeApi(payload);
+    },
+  });
+};
+
+export const useRemoveCardAssignee = () => {
+  return useMutation({
+    mutationFn: async (payload: RemoveCardAssigneeT) => {
+      return await removeCardAssigneeApi(payload);
     },
   });
 };
