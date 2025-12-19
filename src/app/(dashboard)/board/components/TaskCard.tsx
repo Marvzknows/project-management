@@ -1,10 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import PriorityBadge, { Priority } from "./PriorityBadge";
-import { MessageCircleMore, Users } from "lucide-react";
+import { MessageCircleMore } from "lucide-react";
 import { CardT } from "@/types/card";
 import { motion } from "framer-motion";
 import { formatDateTime } from "@/lib/utils";
+import TaskCardAssignees from "./TaskCardAssignees";
 
 type Props = {
   props: CardT;
@@ -12,9 +13,15 @@ type Props = {
 };
 
 export default function TaskCard({ props, projectTitle }: Props) {
-  const { title, priority, assignees, commentsCount, createdBy, createdAt } =
-    props;
-
+  const {
+    id,
+    title,
+    priority,
+    assignees,
+    commentsCount,
+    createdBy,
+    createdAt,
+  } = props;
   return (
     <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.15 }}>
       <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
@@ -52,10 +59,11 @@ export default function TaskCard({ props, projectTitle }: Props) {
                 <MessageCircleMore className="h-4 w-4" />
                 <span>{commentsCount}</span>
               </div>
-              <div className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
-                <span>{assignees.length}</span>
-              </div>
+              <TaskCardAssignees
+                assignees={assignees}
+                cardId={id}
+                cardTitle={title}
+              />
             </div>
           </div>
         </CardContent>

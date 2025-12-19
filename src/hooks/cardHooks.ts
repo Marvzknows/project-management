@@ -1,4 +1,6 @@
 import {
+  addCardAssigneeApi,
+  AddCardAssigneeT,
   CardFormDataT,
   createCardApi,
   updateCardPosition,
@@ -26,6 +28,14 @@ export const useUpdateCardPosition = () => {
       cardId: string;
     }) => {
       return await updateCardPosition(payload, cardId);
+    },
+  });
+};
+
+export const useAddCardAssignee = () => {
+  return useMutation({
+    mutationFn: async (payload: AddCardAssigneeT) => {
+      return await addCardAssigneeApi(payload);
     },
   });
 };
