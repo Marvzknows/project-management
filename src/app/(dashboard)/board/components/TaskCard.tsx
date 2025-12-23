@@ -22,8 +22,15 @@ export default function TaskCard({ props, projectTitle }: Props) {
     createdBy,
     createdAt,
   } = props;
+  const handleOnClickCard = () => {
+    alert("CARD ID IS: " + id);
+  };
   return (
-    <motion.div whileHover={{ scale: 1.015 }} transition={{ duration: 0.15 }}>
+    <motion.div
+      whileHover={{ scale: 1.015 }}
+      transition={{ duration: 0.15 }}
+      onClick={handleOnClickCard}
+    >
       <Card className="rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
         <CardContent className="p-4 space-y-3">
           {/* Header */}
