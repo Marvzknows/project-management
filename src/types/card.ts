@@ -22,3 +22,23 @@ export type CardT = {
   }[];
   commentsCount: number;
 };
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+};
+
+export type ShowCardT = {
+  data: {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: string;
+    createdBy: User;
+    assignees: User[];
+    priority: string;
+    comment: string[];
+  };
+};

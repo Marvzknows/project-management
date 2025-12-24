@@ -5,10 +5,11 @@ import {
   createCardApi,
   removeCardAssigneeApi,
   RemoveCardAssigneeT,
+  showCardApi,
   updateCardPosition,
   UpdateCardPositionT,
 } from "@/lib/axios/api/cardApi";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateCard = () => {
   const queryClient = useQueryClient();
@@ -17,6 +18,14 @@ export const useCreateCard = () => {
       return await createCardApi(payload);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
+  });
+};
+
+export const useShowCard = (cardId?: string, enabled?: boolean) => {
+  return useQuery({
+    queryKey: ["showCard", cardId],
+    queryFn: () => showCardApi(cardId as string),
+    enabled: Boolean(cardId) && Boolean(enabled),
   });
 };
 

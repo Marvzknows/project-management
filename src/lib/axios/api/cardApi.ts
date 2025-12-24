@@ -1,3 +1,4 @@
+import { ShowCardT } from "@/types/card";
 import { apiClient } from "../apiClient";
 
 export type CardFormDataT = {
@@ -27,6 +28,10 @@ export type RemoveCardAssigneeT = {
 
 export const createCardApi = async (payload: CardFormDataT) => {
   return await apiClient.post(`/card`, payload);
+};
+
+export const showCardApi = async (cardId: string) => {
+  return await apiClient.get<ShowCardT>(`/card/${cardId}`);
 };
 
 export const updateCardPosition = async (
