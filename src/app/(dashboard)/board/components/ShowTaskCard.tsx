@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, X } from "lucide-react";
 import { useShowCard } from "@/hooks/cardHooks";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Label } from "@/components/ui/label";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 interface ShowTaskCardProps {
   cardId: string;
@@ -121,10 +123,13 @@ export function ShowTaskCard({ cardId, open, setOpen }: ShowTaskCardProps) {
 
               {/* Description */}
               {card.data.description && (
-                <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-900">
-                  <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-                    {card.data.description}
-                  </p>
+                <div className="grid gap-3">
+                  <Label htmlFor="description">Description</Label>
+                  <SimpleEditor
+                    content={JSON.parse(card.data.description)}
+                    onChange={() => {}}
+                    editable={false}
+                  />
                 </div>
               )}
 

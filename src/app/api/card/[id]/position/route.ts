@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 // Update card position and/or list
 export const PATCH = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   try {
     const session = await auth.api.getSession({
@@ -17,7 +17,7 @@ export const PATCH = async (
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id: cardId } = params;
+    const { id: cardId } = await params;
     const {
       boardId,
       listId: newListId,

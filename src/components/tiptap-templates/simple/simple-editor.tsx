@@ -191,12 +191,14 @@ type SimpleEditorProps = {
   content: string;
   onChange: (value: string) => void;
   isLoading?: boolean;
+  editable?: boolean;
 };
 
 export function SimpleEditor({
   content,
   onChange,
   isLoading,
+  editable = false,
 }: SimpleEditorProps) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
@@ -207,6 +209,7 @@ export function SimpleEditor({
 
   const editor = useEditor({
     immediatelyRender: false,
+    editable: editable,
     editorProps: {
       attributes: {
         autocomplete: "off",
