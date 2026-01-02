@@ -6,6 +6,8 @@ import {
   removeCardAssigneeApi,
   RemoveCardAssigneeT,
   showCardApi,
+  updateCardApi,
+  UpdateCardData,
   updateCardPosition,
   UpdateCardPositionT,
 } from "@/lib/axios/api/cardApi";
@@ -18,6 +20,17 @@ export const useCreateCard = () => {
       return await createCardApi(payload);
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["boardData"] }),
+  });
+};
+
+export const useUpdateCard = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { payload: UpdateCardData; cardId: string }) => {
+      return await updateCardApi(data.payload, data.cardId);
+    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["boardData", "showCard"] }),
   });
 };
 

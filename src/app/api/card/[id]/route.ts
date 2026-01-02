@@ -76,13 +76,6 @@ export const PUT = async (
     const body = await req.json();
     const { title, description, assignees, priority } = body;
 
-    if (description && typeof description !== "object") {
-      return NextResponse.json(
-        { error: "Invalid description format" },
-        { status: 400 }
-      );
-    }
-
     const card = await prisma.card.findUnique({
       where: { id: cardId },
       select: {

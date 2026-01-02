@@ -26,8 +26,22 @@ export type RemoveCardAssigneeT = {
   assigneeId: string;
 };
 
+export type UpdateCardData = {
+  title: string;
+  description: string;
+  priority: string;
+  assignees: string[];
+};
+
 export const createCardApi = async (payload: CardFormDataT) => {
   return await apiClient.post(`/card`, payload);
+};
+
+export const updateCardApi = async (
+  payload: UpdateCardData,
+  cardId: string
+) => {
+  return await apiClient.put(`/card/${cardId}`, payload);
 };
 
 export const showCardApi = async (cardId: string) => {
