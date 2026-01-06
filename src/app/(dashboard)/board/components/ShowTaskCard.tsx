@@ -188,219 +188,222 @@ export function ShowTaskCard({
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          {isLoading && (
+          {isLoading ? (
             <div className="flex h-64 items-center justify-center">
               <div className="h-10 w-10 animate-spin rounded-full border-3 border-gray-200 border-t-blue-600 dark:border-gray-700 dark:border-t-blue-400" />
             </div>
+          ) : (
+            card && (
+              <div className="space-y-6">
+                {/* Priority Badge/Select */}
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select
+                      value={editedPriority}
+                      onValueChange={setEditedPriority}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="LOW">Low</SelectItem>
+                        <SelectItem value="MEDIUM">Medium</SelectItem>
+                        <SelectItem value="HIGH">High</SelectItem>
+                        <SelectItem value="URGENT">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <div className="flex justify-start">
+                    <Badge
+                      variant="secondary"
+                      className={`${priorityConfig[card.data.priority]?.bg} ${
+                        priorityConfig[card.data.priority]?.text
+                      } ${priorityConfig[card.data.priority]?.darkBg} ${
+                        priorityConfig[card.data.priority]?.darkText
+                      } border-0 px-3 py-1 text-xs font-semibold uppercase tracking-wide`}
+                    >
+                      {card.data.priority}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Title */}
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      value={editedTitle}
+                      onChange={(e) => setEditedTitle(e.target.value)}
+                      placeholder="Enter task title"
+                      className="text-lg font-semibold"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <h2 className="text-2xl font-bold leading-tight text-gray-900 dark:text-gray-100">
+                      {card.data.title}
+                    </h2>
+                  </div>
+                )}
+
+                {/* Description */}
+                <div className="grid gap-3">
+                  <Label htmlFor="description">Description</Label>
+                  {isEditing ? (
+                    <SimpleEditor
+                      key={`editor-edit-${cardId}-${card.data.description}`}
+                      content={editedDescription}
+                      onChange={setEditedDescription}
+                      editable={true}
+                    />
+                  ) : card.data.description ? (
+                    <SimpleEditor
+                      key={`editor-view-${cardId}-${card.data.description}`}
+                      content={parseDescription(card.data.description)}
+                      onChange={() => {}}
+                      editable={false}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No description provided
+                    </p>
+                  )}
+                </div>
+
+                {/* Creator Info */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    Created By
+                  </p>
+                  <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
+                    <Avatar className="h-12 w-12 ring-2 ring-white dark:ring-gray-800">
+                      <AvatarImage src={card.data.createdBy.image || ""} />
+                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white">
+                        {card.data.createdBy.name?.[0]?.toUpperCase() ?? "?"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        {card.data.createdBy.name ?? "Unknown"}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate dark:text-gray-400">
+                        {card.data.createdBy.email}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Assignees */}
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                    {isEditing ? "Assign to" : "Assigned to"}{" "}
+                    {isEditing
+                      ? `${editedAssignees.length} ${
+                          editedAssignees.length === 1 ? "person" : "people"
+                        }`
+                      : `${card.data.assignees.length} ${
+                          card.data.assignees.length === 1 ? "person" : "people"
+                        }`}
+                  </p>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      {boardMembers.map((member) => (
+                        <div
+                          key={member.id}
+                          onClick={() => toggleAssignee(member.id)}
+                          className={`flex items-center gap-3 rounded-lg p-3 cursor-pointer transition-colors ${
+                            editedAssignees.includes(member.id)
+                              ? "bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-950 dark:ring-blue-600"
+                              : "bg-gray-50 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800"
+                          }`}
+                        >
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={member.image || undefined} />
+                            <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-600 text-xs font-semibold text-white">
+                              {member.name?.[0]?.toUpperCase() ?? "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                              {member.name}
+                            </span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {member.email}
+                            </p>
+                          </div>
+                          {editedAssignees.includes(member.id) && (
+                            <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center">
+                              <svg
+                                className="h-3 w-3 text-white"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path d="M5 13l4 4L19 7"></path>
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : card.data.assignees.length > 0 ? (
+                    <div className="space-y-2">
+                      {card.data.assignees.map((user) => (
+                        <div
+                          key={user.id}
+                          className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800"
+                        >
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage src={user.image || undefined} />
+                            <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-600 text-xs font-semibold text-white">
+                              {user.name?.[0]?.toUpperCase() ?? "?"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {user.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No assignees
+                    </p>
+                  )}
+                </div>
+
+                {/* Metadata */}
+                <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
+                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                    <Calendar className="h-4 w-4" />
+                    <span className="text-sm font-medium">
+                      Created on{" "}
+                      {new Date(card.data.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        }
+                      )}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )
           )}
 
-          {isError && (
+          {!isLoading && isError && (
             <div className="flex h-64 items-center justify-center rounded-lg bg-red-50 dark:bg-red-950/20">
               <p className="text-sm font-medium text-red-600 dark:text-red-400">
                 Failed to load task details
               </p>
-            </div>
-          )}
-
-          {card && (
-            <div className="space-y-6">
-              {/* Priority Badge/Select */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label htmlFor="priority">Priority</Label>
-                  <Select
-                    value={editedPriority}
-                    onValueChange={setEditedPriority}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                      <SelectItem value="URGENT">Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <div className="flex justify-start">
-                  <Badge
-                    variant="secondary"
-                    className={`${priorityConfig[card.data.priority]?.bg} ${
-                      priorityConfig[card.data.priority]?.text
-                    } ${priorityConfig[card.data.priority]?.darkBg} ${
-                      priorityConfig[card.data.priority]?.darkText
-                    } border-0 px-3 py-1 text-xs font-semibold uppercase tracking-wide`}
-                  >
-                    {card.data.priority}
-                  </Badge>
-                </div>
-              )}
-
-              {/* Title */}
-              {isEditing ? (
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    value={editedTitle}
-                    onChange={(e) => setEditedTitle(e.target.value)}
-                    placeholder="Enter task title"
-                    className="text-lg font-semibold"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <h2 className="text-2xl font-bold leading-tight text-gray-900 dark:text-gray-100">
-                    {card.data.title}
-                  </h2>
-                </div>
-              )}
-
-              {/* Description */}
-              <div className="grid gap-3">
-                <Label htmlFor="description">Description</Label>
-                {isEditing ? (
-                  <SimpleEditor
-                    key={`editor-edit-${cardId}-${card.data.description}`}
-                    content={editedDescription}
-                    onChange={setEditedDescription}
-                    editable={true}
-                  />
-                ) : card.data.description ? (
-                  <SimpleEditor
-                    key={`editor-view-${cardId}-${card.data.description}`}
-                    content={parseDescription(card.data.description)}
-                    onChange={() => {}}
-                    editable={false}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    No description provided
-                  </p>
-                )}
-              </div>
-
-              {/* Creator Info */}
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Created By
-                </p>
-                <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
-                  <Avatar className="h-12 w-12 ring-2 ring-white dark:ring-gray-800">
-                    <AvatarImage src={card.data.createdBy.image || ""} />
-                    <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white">
-                      {card.data.createdBy.name?.[0]?.toUpperCase() ?? "?"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                      {card.data.createdBy.name ?? "Unknown"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate dark:text-gray-400">
-                      {card.data.createdBy.email}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Assignees */}
-              <div className="space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  {isEditing ? "Assign to" : "Assigned to"}{" "}
-                  {isEditing
-                    ? `${editedAssignees.length} ${
-                        editedAssignees.length === 1 ? "person" : "people"
-                      }`
-                    : `${card.data.assignees.length} ${
-                        card.data.assignees.length === 1 ? "person" : "people"
-                      }`}
-                </p>
-                {isEditing ? (
-                  <div className="space-y-2">
-                    {boardMembers.map((member) => (
-                      <div
-                        key={member.id}
-                        onClick={() => toggleAssignee(member.id)}
-                        className={`flex items-center gap-3 rounded-lg p-3 cursor-pointer transition-colors ${
-                          editedAssignees.includes(member.id)
-                            ? "bg-blue-50 ring-2 ring-blue-500 dark:bg-blue-950 dark:ring-blue-600"
-                            : "bg-gray-50 hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800"
-                        }`}
-                      >
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={member.image || undefined} />
-                          <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-600 text-xs font-semibold text-white">
-                            {member.name?.[0]?.toUpperCase() ?? "?"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {member.name}
-                          </span>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {member.email}
-                          </p>
-                        </div>
-                        {editedAssignees.includes(member.id) && (
-                          <div className="h-5 w-5 rounded-full bg-blue-500 flex items-center justify-center">
-                            <svg
-                              className="h-3 w-3 text-white"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path d="M5 13l4 4L19 7"></path>
-                            </svg>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : card.data.assignees.length > 0 ? (
-                  <div className="space-y-2">
-                    {card.data.assignees.map((user) => (
-                      <div
-                        key={user.id}
-                        className="flex items-center gap-3 rounded-lg bg-gray-50 p-3 transition-colors hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-800"
-                      >
-                        <Avatar className="h-9 w-9">
-                          <AvatarImage src={user.image || undefined} />
-                          <AvatarFallback className="bg-gradient-to-br from-violet-500 to-pink-600 text-xs font-semibold text-white">
-                            {user.name?.[0]?.toUpperCase() ?? "?"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {user.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    No assignees
-                  </p>
-                )}
-              </div>
-
-              {/* Metadata */}
-              <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <Calendar className="h-4 w-4" />
-                  <span className="text-sm font-medium">
-                    Created on{" "}
-                    {new Date(card.data.createdAt).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                </div>
-              </div>
             </div>
           )}
         </div>
