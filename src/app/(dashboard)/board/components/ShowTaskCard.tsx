@@ -166,15 +166,33 @@ export function ShowTaskCard({
           </h3>
           <div className="flex items-center gap-2">
             {!isEditing && card && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-                className="gap-2"
-              >
-                <Edit2 className="h-4 w-4" />
-                Edit
-              </Button>
+              <>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm("Are you sure you want to delete this task?")) {
+                      // Replace this with your actual delete mutation / API call
+                      toast.success(`Task "${card.data.title}" deleted`);
+                      setOpen(false); // close the drawer after deletion
+                    }
+                  }}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Delete
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditing(true)}
+                  className="gap-2"
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Edit
+                </Button>
+              </>
             )}
             <Button
               variant="ghost"
