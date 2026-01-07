@@ -254,10 +254,10 @@ const BoardPage = () => {
   const refetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!user?.activeBoardId || lists.length === 0) return;
+    if (!user?.activeBoardId) return;
 
-    const listChannel = supabase
-      .channel(`board-list-${user.activeBoardId}`)
+    const channel = supabase
+      .channel(`board-changes-${user.activeBoardId}`)
       .on(
         "postgres_changes",
         {
@@ -266,49 +266,32 @@ const BoardPage = () => {
           table: "List",
           filter: `boardId=eq.${user.activeBoardId}`,
         },
-        async (_payload) => {
-          if (refetchTimeoutRef.current) {
+        async () => {
+          if (refetchTimeoutRef.current)
             clearTimeout(refetchTimeoutRef.current);
-          }
-
-          refetchTimeoutRef.current = setTimeout(async () => {
-            await refetchBoard();
-          }, 300);
+          refetchTimeoutRef.current = setTimeout(() => refetchBoard(), 300);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Card",
+        },
+        async () => {
+          if (refetchTimeoutRef.current)
+            clearTimeout(refetchTimeoutRef.current);
+          refetchTimeoutRef.current = setTimeout(() => refetchBoard(), 300);
         }
       )
       .subscribe();
 
-    const cardChannels = lists.map((list) =>
-      supabase
-        .channel(`card-${list.id}`)
-        .on(
-          "postgres_changes",
-          {
-            event: "*",
-            schema: "public",
-            table: "Card",
-            filter: `listId=eq.${list.id}`,
-          },
-          async (_payload) => {
-            if (refetchTimeoutRef.current) {
-              clearTimeout(refetchTimeoutRef.current);
-            }
-            refetchTimeoutRef.current = setTimeout(async () => {
-              await refetchBoard();
-            }, 300);
-          }
-        )
-        .subscribe()
-    );
-
     return () => {
-      if (refetchTimeoutRef.current) {
-        clearTimeout(refetchTimeoutRef.current);
-      }
-      listChannel.unsubscribe();
-      cardChannels.forEach((channel) => channel.unsubscribe());
+      if (refetchTimeoutRef.current) clearTimeout(refetchTimeoutRef.current);
+      channel.unsubscribe();
     };
-  }, [user?.activeBoardId, refetchBoard, lists]);
+  }, [user?.activeBoardId, refetchBoard]);
 
   return (
     <div className="p-4 h-full flex flex-col">

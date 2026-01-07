@@ -229,6 +229,7 @@ const AddCardDialog = ({ open, onOpenChange, listId }: AddCardDialogProps) => {
                 onChange={(content) =>
                   setFormData((p) => ({ ...p, description: content }))
                 }
+                editable={true}
               />
             </div>
           </div>
