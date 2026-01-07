@@ -3,6 +3,7 @@ import {
   AddCardAssigneeT,
   CardFormDataT,
   createCardApi,
+  deleteCardApi,
   removeCardAssigneeApi,
   RemoveCardAssigneeT,
   showCardApi,
@@ -52,6 +53,14 @@ export const useUpdateCardPosition = () => {
       cardId: string;
     }) => {
       return await updateCardPosition(payload, cardId);
+    },
+  });
+};
+
+export const useDeleteCard = () => {
+  return useMutation({
+    mutationFn: async (cardId: string) => {
+      return await deleteCardApi(cardId);
     },
   });
 };

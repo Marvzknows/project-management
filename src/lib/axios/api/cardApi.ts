@@ -48,6 +48,10 @@ export const showCardApi = async (cardId: string) => {
   return await apiClient.get<ShowCardT>(`/card/${cardId}`);
 };
 
+export const deleteCardApi = async (cardId: string) => {
+  return await apiClient.delete(`/card/${cardId}`);
+};
+
 export const updateCardPosition = async (
   payload: UpdateCardPositionT,
   cardId: string

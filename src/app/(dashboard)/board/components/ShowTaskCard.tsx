@@ -11,7 +11,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, X, Edit2, Save, XCircle } from "lucide-react";
-import { useShowCard, useUpdateCard } from "@/hooks/cardHooks";
+import { useDeleteCard, useShowCard, useUpdateCard } from "@/hooks/cardHooks";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -91,8 +91,9 @@ export function ShowTaskCard({
   } = useShowCard(cardId, open && !!cardId);
 
   const { mutate: updateCard, isPending } = useUpdateCard();
+  const { mutate: deleteCard, isPending: isDeleting } = useDeleteCard();
 
-  const isLoading = isPending || isLoadingShow;
+  const isLoading = isPending || isLoadingShow || isDeleting;
   // Initialize edit form when card data loads OR when entering edit mode
   useEffect(() => {
     if (card?.data) {
@@ -144,6 +145,18 @@ export function ShowTaskCard({
     }
   };
 
+  const handleDelete = () => {
+    deleteCard(cardId, {
+      onSuccess: () => {
+        toast.success("Card deleted successfully");
+        setOpen(false);
+      },
+      onError: (error) => {
+        toast.error(error.message || "Deleting card failed");
+      },
+    });
+  };
+
   const toggleAssignee = (userId: string) => {
     setEditedAssignees((prev) =>
       prev.includes(userId)
@@ -170,13 +183,7 @@ export function ShowTaskCard({
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => {
-                    if (confirm("Are you sure you want to delete this task?")) {
-                      // Replace this with your actual delete mutation / API call
-                      toast.success(`Task "${card.data.title}" deleted`);
-                      setOpen(false); // close the drawer after deletion
-                    }
-                  }}
+                  onClick={handleDelete}
                   className="gap-2"
                 >
                   <X className="h-4 w-4" />
