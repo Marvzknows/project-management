@@ -97,9 +97,14 @@ export const DELETE = async (
     }
 
     // Delete the list
-    await prisma.list.delete({
-      where: { id },
-    });
+    await prisma.$transaction([
+      prisma.card.deleteMany({
+        where: { listId: id },
+      }),
+      prisma.list.delete({
+        where: { id },
+      }),
+    ]);
 
     return NextResponse.json(
       { message: "List deleted successfully" },

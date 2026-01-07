@@ -1,10 +1,12 @@
-import { SessionT, UserT } from "@/lib/auth";
+import { MeApi, SessionT } from "@/lib/auth";
 import { createContext } from "react";
 
 export type AuthContextType = {
-  user: UserT | null;
+  user: MeApi | null;
   session: SessionT | null;
-  setUserAuth: (user: UserT | null) => void;
+  setUserAuth: (
+    value: MeApi | ((prev: MeApi | null) => MeApi | null) | null
+  ) => void;
   setSessionAuth: (user: SessionT | null) => void;
 };
 
