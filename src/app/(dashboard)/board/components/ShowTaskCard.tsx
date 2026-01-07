@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, X, Edit2, Save, XCircle } from "lucide-react";
+import { Calendar, X, Edit2, Save, XCircle, Trash2 } from "lucide-react";
 import { useDeleteCard, useShowCard, useUpdateCard } from "@/hooks/cardHooks";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { UpdateCardData } from "@/lib/axios/api/cardApi";
 import { useEffect, useState } from "react";
 import { parseDescription } from "@/lib/utils";
+import AlertConfirmationDialog from "@/components/AlertConfirmationDialog";
 
 interface ShowTaskCardProps {
   cardId: string;
@@ -180,15 +181,21 @@ export function ShowTaskCard({
           <div className="flex items-center gap-2">
             {!isEditing && card && (
               <>
-                <Button
+                <AlertConfirmationDialog
+                  trigger={
+                    <Button variant="destructive" size="sm" className="gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </Button>
+                  }
+                  title="Delete Task?"
+                  description="This action cannot be undone. This will permanently delete this task and all its data."
+                  confirmText="Delete"
+                  cancelText="Cancel"
+                  onConfirm={handleDelete}
                   variant="destructive"
-                  size="sm"
-                  onClick={handleDelete}
-                  className="gap-2"
-                >
-                  <X className="h-4 w-4" />
-                  Delete
-                </Button>
+                  isLoading={isDeleting}
+                />
 
                 <Button
                   variant="outline"
