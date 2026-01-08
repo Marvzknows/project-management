@@ -125,9 +125,11 @@ export default function DashboardLayoutClient({
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 flex flex-col mx-auto w-full min-h-0 overflow-hidden">
+        {/* <div className="flex-1 flex flex-col mx-auto w-full min-h-0 overflow-hidden">
           {children}
-        </div>
+        </div> */}
+
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </SidebarInset>
       <Toaster richColors position="bottom-right" />
     </SidebarProvider>

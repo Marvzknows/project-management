@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
 import DashboardHeader from "./components/DashboardHeader";
+import MyTasksSection from "./components/MyTaskSection";
 
 const Dashboard = async () => {
   const session = await auth.api.getSession({
@@ -12,14 +13,22 @@ const Dashboard = async () => {
     redirect("/sign-in");
   }
   return (
-    <>
+    <div className="p-6 space-y-6">
       <DashboardHeader
         totalBoards={0}
         totalTasks={0}
         assignedTasks={0}
         urgentTasks={0}
       />
-    </>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <MyTasksSection />
+
+        <div className="border border-red-500 p-2">
+          Recent Activity (Timeline)
+        </div>
+      </div>
+    </div>
   );
 
   // ┌─────────────────────────────────────────────────┐
