@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import DashboardHeader from "./components/DashboardHeader";
 import MyTasksSection from "./components/MyTaskSection";
+import PriorityDistributionChart from "./components/charts/PriorityDistributionChart";
 
 const Dashboard = async () => {
   const session = await auth.api.getSession({
@@ -21,26 +22,23 @@ const Dashboard = async () => {
         urgentTasks={0}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border border-red-500 h-max">
         <MyTasksSection />
 
-        <div className="border border-red-500 p-2">
-          Recent Activity (Timeline)
-        </div>
+        <PriorityDistributionChart />
       </div>
     </div>
   );
 
   // ┌─────────────────────────────────────────────────┐
   // │  Stats Cards (4 across)                         │
-  // │  [Boards] [Tasks] [Assigned] [Urgent]          │
+  // │  [Boards] [Tasks] [Assigned] [Urgent]           │
   // ├─────────────────┬───────────────────────────────┤
   // │                 │                               │
-  // │  My Tasks       │  Recent Activity              │
+  // │  My Tasks       │  Priority Distribution Chart  │
   // │  (Assigned)     │  (Timeline)                   │
   // │                 │                               │
   // ├─────────────────┴───────────────────────────────┤
-  // │  Priority Distribution Chart                    │
   // ├─────────────────────────────────────────────────┤
   // │  My Boards (Grid or List View)                  │
   // │  [Board 1] [Board 2] [Board 3]                  │
