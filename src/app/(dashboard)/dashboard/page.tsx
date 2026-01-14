@@ -3,8 +3,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
 import DashboardHeader from "./components/DashboardHeader";
-import MyTasksSection from "./components/MyTaskSection";
 import PriorityDistributionChart from "./components/charts/PriorityDistributionChart";
+import TeamWorkloadChart from "./components/TeamWorkloadChart";
 
 const Dashboard = async () => {
   const session = await auth.api.getSession({
@@ -22,10 +22,13 @@ const Dashboard = async () => {
         urgentTasks={0}
       />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 border border-red-500 h-max">
-        <MyTasksSection />
-
-        <PriorityDistributionChart />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        <div className="h-[600px]">
+          <PriorityDistributionChart />
+        </div>
+        <div className="h-[600px]">
+          <TeamWorkloadChart />
+        </div>
       </div>
     </div>
   );
