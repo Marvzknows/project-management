@@ -38,32 +38,14 @@ const Dashboard = async () => {
   // │  [Boards] [Tasks] [Assigned] [Urgent]           │
   // ├─────────────────┬───────────────────────────────┤
   // │                 │                               │
-  // │  My Tasks       │  Priority Distribution Chart  │
+  // │TeamWorkloadChart│  Priority Distribution Chart  │
   // │  (Assigned)     │  (Timeline)                   │
   // │                 │                               │
   // ├─────────────────┴───────────────────────────────┤
   // ├─────────────────────────────────────────────────┤
-  // │  My Boards (Grid or List View)                  │
-  // │  [Board 1] [Board 2] [Board 3]                  │
+  // │                                                 │
   // └─────────────────────────────────────────────────┘
   // -------------------------------------------------
-
-  // Stats Cards:
-  // - Total Boards (owned + member)
-  // - Total Active Tasks (cards without deletedAt)
-  // - Tasks Assigned to You
-  // - Urgent Priority Count
-
-  // Recent Activity
-  // - Recently created cards (last 7 days)
-  // - Recently updated cards
-  // - Comments you've made
-  // - Cards you've been assigned to
-  // - New boards you've been added to
-
-  // Priority Distribution Chart
-  // - Pie chart or bar chart showing LOW/MEDIUM/HIGH/URGENT
-  // - Filter by: All boards, specific board, or assigned to me
 };
 
 export default Dashboard;
