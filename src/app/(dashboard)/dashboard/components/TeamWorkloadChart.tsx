@@ -25,6 +25,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+export type Props = {
+  boards: {
+    id: string;
+    title: string;
+  }[];
+};
 
 // Mock data - query Card model with assignees relation
 const chartData = [
@@ -46,15 +52,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const boards = [
-  { id: "all", name: "All Boards" },
-  { id: "1", name: "Development" },
-  { id: "2", name: "Marketing" },
-  { id: "3", name: "Design" },
-];
-
-const TeamWorkloadChart = () => {
-  const [selectedBoard, setSelectedBoard] = useState("all");
+const TeamWorkloadChart = ({ boards }: Props) => {
+  const [selectedBoard, setSelectedBoard] = useState(" ");
 
   return (
     <Card>
@@ -71,9 +70,10 @@ const TeamWorkloadChart = () => {
               <SelectValue placeholder="Select board" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value={" "}>All Boards</SelectItem>
               {boards.map((board) => (
                 <SelectItem key={board.id} value={board.id}>
-                  {board.name}
+                  {board.title}
                 </SelectItem>
               ))}
             </SelectContent>

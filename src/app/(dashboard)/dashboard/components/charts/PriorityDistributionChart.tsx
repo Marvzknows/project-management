@@ -27,15 +27,12 @@ import {
 } from "@/components/ui/select";
 
 export const description = "A priority distribution bar chart";
-
-// Mock boards data - replace with actual data from your API
-const boards = [
-  { id: "all", name: "All Boards" },
-  { id: "1", name: "Development" },
-  { id: "2", name: "Marketing" },
-  { id: "3", name: "Design" },
-];
-
+export type Props = {
+  boards: {
+    id: string;
+    title: string;
+  }[];
+};
 // Mock data per board - replace with actual data
 const boardData = {
   all: [
@@ -86,8 +83,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const PriorityDistributionChart = () => {
-  const [selectedBoard, setSelectedBoard] = useState("all");
+const PriorityDistributionChart = ({ boards }: Props) => {
+  const [selectedBoard, setSelectedBoard] = useState(" ");
   const chartData = boardData[selectedBoard as keyof typeof boardData];
 
   return (
@@ -103,9 +100,10 @@ const PriorityDistributionChart = () => {
               <SelectValue placeholder="Select board" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value={" "}>All Boards</SelectItem>
               {boards.map((board) => (
                 <SelectItem key={board.id} value={board.id}>
-                  {board.name}
+                  {board.title}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -138,7 +136,7 @@ const PriorityDistributionChart = () => {
           {selectedBoard === "all"
             ? "Showing all tasks across all boards"
             : `Showing tasks for ${
-                boards.find((b) => b.id === selectedBoard)?.name
+                boards.find((b) => b.id === selectedBoard)?.title
               }`}
         </div>
       </CardFooter>
