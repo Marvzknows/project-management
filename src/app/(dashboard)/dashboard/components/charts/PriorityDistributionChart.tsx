@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetDashboardPriorityDistribution } from "@/hooks/dashboardHooks";
 
 export const description = "A priority distribution bar chart";
 export type Props = {
@@ -32,33 +33,6 @@ export type Props = {
     id: string;
     title: string;
   }[];
-};
-// Mock data per board - replace with actual data
-const boardData = {
-  all: [
-    { priority: "Low", tasks: 23, fill: "hsl(142, 76%, 36%)" },
-    { priority: "Medium", tasks: 45, fill: "hsl(48, 96%, 53%)" },
-    { priority: "High", tasks: 32, fill: "hsl(25, 95%, 53%)" },
-    { priority: "Urgent", tasks: 12, fill: "hsl(0, 84%, 60%)" },
-  ],
-  "1": [
-    { priority: "Low", tasks: 8, fill: "hsl(142, 76%, 36%)" },
-    { priority: "Medium", tasks: 15, fill: "hsl(48, 96%, 53%)" },
-    { priority: "High", tasks: 12, fill: "hsl(25, 95%, 53%)" },
-    { priority: "Urgent", tasks: 5, fill: "hsl(0, 84%, 60%)" },
-  ],
-  "2": [
-    { priority: "Low", tasks: 10, fill: "hsl(142, 76%, 36%)" },
-    { priority: "Medium", tasks: 18, fill: "hsl(48, 96%, 53%)" },
-    { priority: "High", tasks: 8, fill: "hsl(25, 95%, 53%)" },
-    { priority: "Urgent", tasks: 3, fill: "hsl(0, 84%, 60%)" },
-  ],
-  "3": [
-    { priority: "Low", tasks: 5, fill: "hsl(142, 76%, 36%)" },
-    { priority: "Medium", tasks: 12, fill: "hsl(48, 96%, 53%)" },
-    { priority: "High", tasks: 12, fill: "hsl(25, 95%, 53%)" },
-    { priority: "Urgent", tasks: 4, fill: "hsl(0, 84%, 60%)" },
-  ],
 };
 
 const chartConfig = {
@@ -84,8 +58,14 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const PriorityDistributionChart = ({ boards }: Props) => {
-  const [selectedBoard, setSelectedBoard] = useState(" ");
-  const chartData = boardData[selectedBoard as keyof typeof boardData];
+  const [selectedBoard, setSelectedBoard] = useState("all");
+  const { data, isLoading } =
+    useGetDashboardPriorityDistribution(selectedBoard);
+
+  const mostTasks = data?.data?.reduce(
+    (max, curr) => (curr.tasks > max.tasks ? curr : max),
+    data?.data?.[0],
+  );
 
   return (
     <Card>
@@ -95,12 +75,16 @@ const PriorityDistributionChart = ({ boards }: Props) => {
             <CardTitle>Priority Distribution</CardTitle>
             <CardDescription>Task breakdown by priority level</CardDescription>
           </div>
-          <Select value={selectedBoard} onValueChange={setSelectedBoard}>
+          <Select
+            disabled={isLoading}
+            value={selectedBoard}
+            onValueChange={setSelectedBoard}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select board" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={" "}>All Boards</SelectItem>
+              <SelectItem value={"all"}>All Boards</SelectItem>
               {boards.map((board) => (
                 <SelectItem key={board.id} value={board.id}>
                   {board.title}
@@ -112,7 +96,7 @@ const PriorityDistributionChart = ({ boards }: Props) => {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[200px] w-full">
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={data?.data}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="priority"
@@ -129,9 +113,12 @@ const PriorityDistributionChart = ({ boards }: Props) => {
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          Most tasks are medium priority <TrendingUp className="h-4 w-4" />
-        </div>
+        {mostTasks && data?.data.length && (
+          <div className="flex gap-2 leading-none font-medium">
+            Most tasks are {mostTasks.priority} priority{" "}
+            <TrendingUp className="h-4 w-4" />
+          </div>
+        )}
         <div className="text-muted-foreground leading-none">
           {selectedBoard === "all"
             ? "Showing all tasks across all boards"

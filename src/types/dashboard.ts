@@ -9,3 +9,11 @@ export type DashboardHeaderT = {
     urgent_cards: number;
   };
 };
+
+export type DashboardPriorityDistributionT = {
+  data: {
+    priority: string;
+    tasks: number;
+    fill: string;
+  }[];
+};

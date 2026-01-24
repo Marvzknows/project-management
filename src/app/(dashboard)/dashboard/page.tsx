@@ -33,12 +33,12 @@ const Dashboard = () => {
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        <div className="h-[600px]">
+        <div>
           <PriorityDistributionChart
             boards={dashboardHeaderData?.data.boards ?? []}
           />
         </div>
-        <div className="h-[600px]">
+        <div>
           <TeamWorkloadChart boards={dashboardHeaderData?.data.boards ?? []} />
         </div>
       </div>
