@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 // Get Board by ID
 export const GET = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   const { id } = await params;
   try {
@@ -74,6 +74,7 @@ export const GET = async (
                     image: true,
                   },
                 },
+                status: true,
               },
             },
           },
@@ -94,7 +95,7 @@ export const GET = async (
     }
 
     const isMember = board.members.some(
-      (member) => member.id === session.user.id
+      (member) => member.id === session.user.id,
     );
     if (!isMember) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -118,7 +119,7 @@ export const GET = async (
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -126,7 +127,7 @@ export const GET = async (
 // Delete Board by ID
 export const DELETE = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   const { id } = await params;
   try {
@@ -167,13 +168,13 @@ export const DELETE = async (
       {
         message: "Board deleted successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Delete board error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -181,7 +182,7 @@ export const DELETE = async (
 // Update user active board
 export const PUT = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
     const session = await auth.api.getSession({
@@ -222,12 +223,12 @@ export const PUT = async (
       {
         message: "Set active board successfully",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

@@ -83,7 +83,7 @@ const BoardPage = () => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
-    })
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -98,7 +98,7 @@ const BoardPage = () => {
 
     // Check if dragging a card
     const sourceList = lists.find((list) =>
-      list.cards.some((card) => card.id === active.id)
+      list.cards.some((card) => card.id === active.id),
     );
 
     if (sourceList) {
@@ -121,14 +121,14 @@ const BoardPage = () => {
 
     // Determine if we're dragging a card
     const sourceList = lists.find((list) =>
-      list.cards.some((card) => card.id === activeId)
+      list.cards.some((card) => card.id === activeId),
     );
 
     if (!sourceList) return; // Not dragging a card
 
     // Find the list that contains the over item (could be a card or list drop zone)
     let targetList = lists.find((list) =>
-      list.cards.some((card) => card.id === overId)
+      list.cards.some((card) => card.id === overId),
     );
 
     // If over item is not a card, check if it's a list drop zone
@@ -140,14 +140,14 @@ const BoardPage = () => {
     if (!targetList) return;
 
     const activeListIndex = lists.findIndex(
-      (list) => list.id === sourceList.id
+      (list) => list.id === sourceList.id,
     );
     const overListIndex = lists.findIndex((list) => list.id === targetList.id);
 
     if (activeListIndex === overListIndex) {
       // Moving within the same list
       const oldIndex = sourceList.cards.findIndex(
-        (card) => card.id === activeId
+        (card) => card.id === activeId,
       );
       const overCard = targetList.cards.find((card) => card.id === overId);
       const newIndex = overCard
@@ -166,7 +166,7 @@ const BoardPage = () => {
       if (!movedCard) return;
 
       const newActiveCards = sourceList.cards.filter(
-        (card) => card.id !== activeId
+        (card) => card.id !== activeId,
       );
 
       const overCard = targetList.cards.find((card) => card.id === overId);
@@ -203,7 +203,7 @@ const BoardPage = () => {
 
         updateBoardListOrderMutation(
           { listId: String(active.id), position: newIndex + 1 },
-          { onError: () => toast.error("Updating list position failed") }
+          { onError: () => toast.error("Updating list position failed") },
         );
       }
       return;
@@ -211,13 +211,13 @@ const BoardPage = () => {
 
     // Handle card drop
     const sourceList = lists.find((list) =>
-      list.cards.some((card) => card.id === active.id)
+      list.cards.some((card) => card.id === active.id),
     );
 
     if (!sourceList) return;
 
     let targetList = lists.find((list) =>
-      list.cards.some((card) => card.id === over.id)
+      list.cards.some((card) => card.id === over.id),
     );
 
     if (!targetList) {
@@ -240,7 +240,7 @@ const BoardPage = () => {
     };
     updateCardPositionMutation(
       { payload: payload, cardId: String(card.id) },
-      { onError: () => toast.error("Updating card position failed") }
+      { onError: () => toast.error("Updating card position failed") },
     );
 
     console.log("Card moved:", {
@@ -270,7 +270,7 @@ const BoardPage = () => {
           if (refetchTimeoutRef.current)
             clearTimeout(refetchTimeoutRef.current);
           refetchTimeoutRef.current = setTimeout(() => refetchBoard(), 300);
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -283,7 +283,7 @@ const BoardPage = () => {
           if (refetchTimeoutRef.current)
             clearTimeout(refetchTimeoutRef.current);
           refetchTimeoutRef.current = setTimeout(() => refetchBoard(), 300);
-        }
+        },
       )
       .subscribe();
 

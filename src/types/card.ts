@@ -21,6 +21,7 @@ export type CardT = {
     image: string;
   }[];
   commentsCount: number;
+  status: string;
 };
 
 type User = {
@@ -40,5 +41,6 @@ export type ShowCardT = {
     assignees: User[];
     priority: string;
     comment: string[];
+    status: string;
   };
 };

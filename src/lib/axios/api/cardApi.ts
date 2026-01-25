@@ -31,6 +31,7 @@ export type UpdateCardData = {
   description: string;
   priority: string;
   assignees: string[];
+  status: string;
 };
 
 export const createCardApi = async (payload: CardFormDataT) => {
@@ -39,7 +40,7 @@ export const createCardApi = async (payload: CardFormDataT) => {
 
 export const updateCardApi = async (
   payload: UpdateCardData,
-  cardId: string
+  cardId: string,
 ) => {
   return await apiClient.put(`/card/${cardId}`, payload);
 };
@@ -54,7 +55,7 @@ export const deleteCardApi = async (cardId: string) => {
 
 export const updateCardPosition = async (
   payload: UpdateCardPositionT,
-  cardId: string
+  cardId: string,
 ) => {
   return await apiClient.patch(`/card/${cardId}/position`, payload);
 };
@@ -65,6 +66,6 @@ export const addCardAssigneeApi = async (payload: AddCardAssigneeT) => {
 
 export const removeCardAssigneeApi = async (params: RemoveCardAssigneeT) => {
   return await apiClient.delete(
-    `/card/${params.cardId}/assignee/${params.assigneeId}`
+    `/card/${params.cardId}/assignee/${params.assigneeId}`,
   );
 };

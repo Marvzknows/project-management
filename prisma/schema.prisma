@@ -135,6 +135,7 @@ model Card {
   assignees   User[]       @relation("CardAssignees")
   priority    PriorityList
   comments    Comment[]
+  status      CardStatus   @default(TODO) // Add this line
 }
 
 // Comment
@@ -155,4 +156,10 @@ enum PriorityList {
   MEDIUM
   HIGH
   URGENT
+}
+
+enum CardStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
 }

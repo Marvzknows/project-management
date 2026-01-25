@@ -72,6 +72,33 @@ const priorityConfig: Record<
   },
 };
 
+const statusConfig: Record<
+  string,
+  { label: string; bg: string; text: string; darkBg: string; darkText: string }
+> = {
+  TODO: {
+    label: "To Do",
+    bg: "bg-slate-100",
+    text: "text-slate-800",
+    darkBg: "dark:bg-slate-950",
+    darkText: "dark:text-slate-300",
+  },
+  IN_PROGRESS: {
+    label: "In Progress",
+    bg: "bg-blue-100",
+    text: "text-blue-800",
+    darkBg: "dark:bg-blue-950",
+    darkText: "dark:text-blue-300",
+  },
+  COMPLETED: {
+    label: "Completed",
+    bg: "bg-green-100",
+    text: "text-green-800",
+    darkBg: "dark:bg-green-950",
+    darkText: "dark:text-green-300",
+  },
+};
+
 export function ShowTaskCard({
   cardId,
   open,
@@ -82,6 +109,7 @@ export function ShowTaskCard({
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState<any>(null);
   const [editedPriority, setEditedPriority] = useState("");
+  const [editedStatus, setEditedStatus] = useState("");
   const [editedAssignees, setEditedAssignees] = useState<string[]>([]);
 
   const {
@@ -95,12 +123,14 @@ export function ShowTaskCard({
   const { mutate: deleteCard, isPending: isDeleting } = useDeleteCard();
 
   const isLoading = isPending || isLoadingShow || isDeleting;
+
   // Initialize edit form when card data loads OR when entering edit mode
   useEffect(() => {
     if (card?.data) {
       setEditedTitle(card.data.title);
       setEditedDescription(parseDescription(card.data.description));
       setEditedPriority(card.data.priority);
+      setEditedStatus(card.data.status || "TODO");
       setEditedAssignees(card.data.assignees.map((a) => a.id));
     }
   }, [card?.data]);
@@ -115,6 +145,7 @@ export function ShowTaskCard({
       title: editedTitle,
       description: editedDescription || "",
       priority: editedPriority,
+      status: editedStatus,
       assignees: editedAssignees,
     };
 
@@ -129,7 +160,7 @@ export function ShowTaskCard({
         onError: (error) => {
           toast.error(error.message || "Updating card failed");
         },
-      }
+      },
     );
   };
 
@@ -139,9 +170,10 @@ export function ShowTaskCard({
     if (card?.data) {
       setEditedTitle(card.data.title);
       setEditedDescription(
-        card.data.description ? JSON.parse(card.data.description) : null
+        card.data.description ? JSON.parse(card.data.description) : null,
       );
       setEditedPriority(card.data.priority);
+      setEditedStatus(card.data.status || "TODO");
       setEditedAssignees(card.data.assignees.map((a) => a.id));
     }
   };
@@ -162,7 +194,7 @@ export function ShowTaskCard({
     setEditedAssignees((prev) =>
       prev.includes(userId)
         ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+        : [...prev, userId],
     );
   };
 
@@ -227,39 +259,71 @@ export function ShowTaskCard({
           ) : (
             card && (
               <div className="space-y-6">
-                {/* Priority Badge/Select */}
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <Label htmlFor="priority">Priority</Label>
-                    <Select
-                      value={editedPriority}
-                      onValueChange={setEditedPriority}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Select priority" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="LOW">Low</SelectItem>
-                        <SelectItem value="MEDIUM">Medium</SelectItem>
-                        <SelectItem value="HIGH">High</SelectItem>
-                        <SelectItem value="URGENT">Urgent</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : (
-                  <div className="flex justify-start">
-                    <Badge
-                      variant="secondary"
-                      className={`${priorityConfig[card.data.priority]?.bg} ${
-                        priorityConfig[card.data.priority]?.text
-                      } ${priorityConfig[card.data.priority]?.darkBg} ${
-                        priorityConfig[card.data.priority]?.darkText
-                      } border-0 px-3 py-1 text-xs font-semibold uppercase tracking-wide`}
-                    >
-                      {card.data.priority}
-                    </Badge>
-                  </div>
-                )}
+                {/* Priority and Status Badges/Selects */}
+                <div className="flex flex-wrap gap-3">
+                  {isEditing ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="priority">Priority</Label>
+                        <Select
+                          value={editedPriority}
+                          onValueChange={setEditedPriority}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select priority" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="LOW">Low</SelectItem>
+                            <SelectItem value="MEDIUM">Medium</SelectItem>
+                            <SelectItem value="HIGH">High</SelectItem>
+                            <SelectItem value="URGENT">Urgent</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select
+                          value={editedStatus}
+                          onValueChange={setEditedStatus}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="TODO">To Do</SelectItem>
+                            <SelectItem value="IN_PROGRESS">
+                              In Progress
+                            </SelectItem>
+                            <SelectItem value="COMPLETED">Completed</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Badge
+                        variant="secondary"
+                        className={`${priorityConfig[card.data.priority]?.bg} ${
+                          priorityConfig[card.data.priority]?.text
+                        } ${priorityConfig[card.data.priority]?.darkBg} ${
+                          priorityConfig[card.data.priority]?.darkText
+                        } border-0 px-3 py-1 text-xs font-semibold uppercase tracking-wide`}
+                      >
+                        {card.data.priority}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className={`${statusConfig[card.data.status || "TODO"]?.bg} ${
+                          statusConfig[card.data.status || "TODO"]?.text
+                        } ${statusConfig[card.data.status || "TODO"]?.darkBg} ${
+                          statusConfig[card.data.status || "TODO"]?.darkText
+                        } border-0 px-3 py-1 text-xs font-semibold uppercase tracking-wide`}
+                      >
+                        {statusConfig[card.data.status || "TODO"]?.label}
+                      </Badge>
+                    </>
+                  )}
+                </div>
 
                 {/* Title */}
                 {isEditing ? (
@@ -422,7 +486,7 @@ export function ShowTaskCard({
                           month: "long",
                           day: "numeric",
                           year: "numeric",
-                        }
+                        },
                       )}
                     </span>
                   </div>

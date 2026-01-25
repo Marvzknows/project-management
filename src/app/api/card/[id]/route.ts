@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 // Get Card by ID
 export const GET = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   const { id: cardId } = await params;
   try {
@@ -43,6 +43,7 @@ export const GET = async (
         },
         priority: true,
         comments: true,
+        status: true,
       },
     });
 
@@ -52,7 +53,7 @@ export const GET = async (
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -60,7 +61,7 @@ export const GET = async (
 // Updare Card
 export const PUT = async (
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
     const { id: cardId } = await params;
@@ -98,13 +99,13 @@ export const PUT = async (
     }
 
     const isMember = card.List.board.members.some(
-      (m) => m.id === session.user.id
+      (m) => m.id === session.user.id,
     );
 
     if (!isMember) {
       return NextResponse.json(
         { error: "You must be a board member to remove assignees" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -112,13 +113,13 @@ export const PUT = async (
     if (assignees?.length) {
       const memberIds = card.List.board.members.map((m) => m.id);
       const invalidAssignees = assignees.filter(
-        (id: string) => !memberIds.includes(id)
+        (id: string) => !memberIds.includes(id),
       );
 
       if (invalidAssignees.length > 0) {
         return NextResponse.json(
           { error: "Some assignees are not board members" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -141,12 +142,12 @@ export const PUT = async (
 
     return NextResponse.json(
       { message: "Card successfully updated", data: updateCard },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
@@ -154,7 +155,7 @@ export const PUT = async (
 // Delete Card
 export const DELETE = async (
   _req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) => {
   try {
     const session = await auth.api.getSession({
@@ -192,13 +193,13 @@ export const DELETE = async (
     }
 
     const isMember = card.List.board.members.some(
-      (m) => m.id === session.user.id
+      (m) => m.id === session.user.id,
     );
 
     if (!isMember) {
       return NextResponse.json(
         { error: "You must be a board member to delete this card" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -212,7 +213,7 @@ export const DELETE = async (
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };
