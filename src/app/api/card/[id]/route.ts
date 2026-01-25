@@ -75,7 +75,7 @@ export const PUT = async (
     }
 
     const body = await req.json();
-    const { title, description, assignees, priority } = body;
+    const { title, description, assignees, priority, status } = body;
 
     const card = await prisma.card.findUnique({
       where: { id: cardId },
@@ -137,6 +137,7 @@ export const PUT = async (
           : { set: [] },
         updatedAt: new Date(),
         priority,
+        status,
       },
     });
 
