@@ -135,7 +135,7 @@ model Card {
   assignees   User[]       @relation("CardAssignees")
   priority    PriorityList
   comments    Comment[]
-  status      CardStatus   @default(TODO) // Add this line
+  status      CardStatus   @default(TODO)
 }
 
 // Comment
