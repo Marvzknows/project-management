@@ -68,8 +68,8 @@ const PriorityDistributionChart = ({ boards }: Props) => {
   );
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex flex-col h-full">
+      <CardHeader className="flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Priority Distribution</CardTitle>
@@ -94,8 +94,8 @@ const PriorityDistributionChart = ({ boards }: Props) => {
           </Select>
         </div>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+      <CardContent className="flex-1 min-h-0 pb-0">
+        <ChartContainer config={chartConfig} className="h-full w-full">
           <BarChart accessibilityLayer data={data?.data}>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -112,7 +112,7 @@ const PriorityDistributionChart = ({ boards }: Props) => {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
+      <CardFooter className="flex-col items-start gap-2 text-sm flex-shrink-0">
         {mostTasks && data?.data.length && (
           <div className="flex gap-2 leading-none font-medium">
             Most tasks are {mostTasks.priority} priority{" "}

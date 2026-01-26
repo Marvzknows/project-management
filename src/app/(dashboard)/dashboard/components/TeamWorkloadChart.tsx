@@ -56,8 +56,8 @@ const TeamWorkloadChart = ({ boards }: Props) => {
   const [selectedBoard, setSelectedBoard] = useState(" ");
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex flex-col h-full">
+      <CardHeader className="flex-shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Team Workload</CardTitle>
@@ -80,8 +80,8 @@ const TeamWorkloadChart = ({ boards }: Props) => {
           </Select>
         </div>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[200px] w-full">
+      <CardContent className="flex-1 min-h-0 pb-0">
+        <ChartContainer config={chartConfig} className="h-full w-full">
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
