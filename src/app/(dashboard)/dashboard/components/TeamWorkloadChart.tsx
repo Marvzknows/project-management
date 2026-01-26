@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { useGetDashboardTeamWorkload } from "@/hooks/dashboardHooks";
 export type Props = {
   boards: {
     id: string;
@@ -32,19 +33,18 @@ export type Props = {
   }[];
 };
 
-// Mock data - query Card model with assignees relation
-const chartData = [
-  { name: "Alice", assigned: 23, completed: 18 },
-  { name: "Bob", assigned: 31, completed: 25 },
-  { name: "Charlie", assigned: 18, completed: 16 },
-  { name: "Diana", assigned: 27, completed: 22 },
-  { name: "Eve", assigned: 15, completed: 12 },
-];
-
 const chartConfig = {
   assigned: {
     label: "Assigned",
     color: "hsl(221, 83%, 53%)",
+  },
+  todo: {
+    label: "To do",
+    color: "hsl(25, 95%, 53%)",
+  },
+  in_progress: {
+    label: "In Progress",
+    color: "hsl(48, 96%, 53%)",
   },
   completed: {
     label: "Completed",
@@ -53,7 +53,9 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const TeamWorkloadChart = ({ boards }: Props) => {
-  const [selectedBoard, setSelectedBoard] = useState(" ");
+  const [selectedBoard, setSelectedBoard] = useState("all");
+  const { data: chartData, isLoading } =
+    useGetDashboardTeamWorkload(selectedBoard);
 
   return (
     <Card className="flex flex-col h-full">
@@ -65,12 +67,16 @@ const TeamWorkloadChart = ({ boards }: Props) => {
               Current task assignments per member
             </CardDescription>
           </div>
-          <Select value={selectedBoard} onValueChange={setSelectedBoard}>
+          <Select
+            disabled={isLoading}
+            value={selectedBoard}
+            onValueChange={setSelectedBoard}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select board" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={" "}>All Boards</SelectItem>
+              <SelectItem value={"all"}>All Boards</SelectItem>
               {boards.map((board) => (
                 <SelectItem key={board.id} value={board.id}>
                   {board.title}
@@ -82,7 +88,7 @@ const TeamWorkloadChart = ({ boards }: Props) => {
       </CardHeader>
       <CardContent className="flex-1 min-h-0 pb-0">
         <ChartContainer config={chartConfig} className="h-full w-full">
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={chartData?.data ?? []}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="name"
@@ -93,6 +99,12 @@ const TeamWorkloadChart = ({ boards }: Props) => {
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Bar dataKey="assigned" fill="var(--color-assigned)" radius={4} />
             <Bar dataKey="completed" fill="var(--color-completed)" radius={4} />
+            <Bar
+              dataKey="in_progress"
+              fill="var(--color-in_progress)"
+              radius={4}
+            />
+            <Bar dataKey="todo" fill="var(--color-todo)" radius={4} />
           </BarChart>
         </ChartContainer>
       </CardContent>

@@ -17,3 +17,11 @@ export type DashboardPriorityDistributionT = {
     fill: string;
   }[];
 };
+
+export type DashboardTeamWorkloadT = {
+  name: string;
+  assigned: number;
+  completed: number;
+  in_progress: number;
+  todo: number;
+};
