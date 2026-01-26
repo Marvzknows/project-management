@@ -24,8 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useGetDashboardTeamWorkload } from "@/hooks/dashboardHooks";
+import { DashboardTeamWorkloadT } from "@/types/dashboard";
 export type Props = {
   boards: {
     id: string;
@@ -56,6 +57,14 @@ const TeamWorkloadChart = ({ boards }: Props) => {
   const [selectedBoard, setSelectedBoard] = useState("all");
   const { data: chartData, isLoading } =
     useGetDashboardTeamWorkload(selectedBoard);
+
+  const memoizedHasMostTask: DashboardTeamWorkloadT | undefined =
+    useMemo(() => {
+      return chartData?.data.reduce(
+        (max, curr) => (curr.assigned > max.assigned ? curr : max),
+        chartData.data[0],
+      );
+    }, [chartData]);
 
   return (
     <Card className="flex flex-col h-full">
@@ -110,10 +119,12 @@ const TeamWorkloadChart = ({ boards }: Props) => {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 leading-none font-medium">
-          Workload is balanced across team <Users className="h-4 w-4" />
+          Workload across team <Users className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none">
-          Bob has the most active tasks
+          {memoizedHasMostTask
+            ? `${memoizedHasMostTask.name} has the most active task`
+            : "N/A"}
         </div>
       </CardFooter>
     </Card>
