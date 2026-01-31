@@ -136,7 +136,10 @@ export const GET = async (req: Request) => {
 
     // base query
     const where = {
-      ownerId: session.user.id,
+      OR: [
+        { ownerId: session.user.id },
+        { members: { some: { id: session.user.id } } },
+      ],
       ...(search.trim()
         ? {
             title: {
