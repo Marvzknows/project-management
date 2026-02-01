@@ -9,6 +9,7 @@ export const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true, // For BetterAuth cookies
+  // del
 });
 
 // Request interceptor - adds auth token if available
@@ -35,5 +36,5 @@ axiosInstance.interceptors.response.use(
       window.location.href = "/sign-in";
     }
     return Promise.reject(error);
-  }
+  },
 );
