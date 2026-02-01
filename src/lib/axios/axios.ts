@@ -9,7 +9,6 @@ export const axiosInstance = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true, // For BetterAuth cookies
-  // del
 });
 
 // Request interceptor - adds auth token if available
